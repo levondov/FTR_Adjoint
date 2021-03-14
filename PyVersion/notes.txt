@@ -1,0 +1,82 @@
+Some further details about the structure of the code
+
+
+# moment_equations_util.py
+#
+# A file full of utility functions needed within the moment calculations.
+#
+#   Functions within this file:
+#
+#   -initial_conditions() - defines the initial beam moments for the simulations.
+#
+#   -initial_magnet_profiles() - defines the initial magnet values: start location, strength, angle, length
+#
+#   -get_beamridg_and_perv() - given an energy and current, returns beam ridgidity and perveance.
+#
+#   -ode3() - third order Runge-Kutta ODE solver
+#
+#   -get_params() - returns a list of parameters for optimization after scalings. 
+#       Inputs: sl: 1.0 - multiplicative value to scale solenoid length
+#               ss: 1.0 - multiplicative value to scale solenoid strength
+#               ss_off: 1.0 - multiplicative value to scale solenoid start position
+#               ql: [1.0,1.0,1.0] - similar length scaling for quads 1,2,3
+#               qs: [1.0,1.0,1.0] - similar strength scaling for quads 1,2,3
+#               qs_off: [1.0,1.0,1.0] - similar scaling for quad 1,2,3 start location
+#               a - multiplicative input vector being optimized after scalings
+#
+#       Outputs: magnet paramaters * scaling values * "a" vector
+#
+#       Description: The scaling terms, sl,ss,ss_off,ql,qs,qs_Off, are used to adjust the default magnet #profiles. e.g. You want to do a run where the quadrupoles are scaled to be 10x longer and 0.5x stronger. #In this case you would input ql = [10,10,10] and qs = [0.5,0.5,0.5]. The input parameter "a" is the #scaling ector used for optimizations, i.e. what the optimizer outputs that is fed back into this function #to return a set of magnet values.
+#
+#
+#
+#
+# moment_equations.py
+#
+# Functions that handle the actual integration of the moment equations
+#
+#   Functions within the file:
+#
+#   -run_moments() - Top level function to run the moment equations and return the results
+#       Inputs: params - magnet parameters
+#               h - integration step size
+#               z_interval - integration range (z_start,z_end)
+#               energy - beam energy
+#               current - beam current
+#               hardedge_flag = 1 - hardedge mode or not, this hasn't fully be implemented yet, just leave default value
+#
+#   -ode_moments() - Called each step of the integration, based on Tom's moment equations
+#   -ode_moments_adjoint - Called each step when calculating adjoint equations, based on Tom's adjoint equations
+#   -get_COM() - returns the constant of motion
+#   -get_FOM() - returns the Figure of Merit
+#   -get_dFOM() - derivatives of the figure of merit.
+#   -get_SCVM() - calculates space charge variation matrices, see Tom's notes
+#
+#
+#
+#
+#
+#
+#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import matplotlib.pyplot as plt
 
 
 
@@ -44,112 +45,89 @@ def Get_beamridg_and_perv(energy=5e3,current=0.0):
     return rho,k_perv
 
 
-def ode3(F,t0,h,tfinal,y0,k,verbose_f):
+def ode3(F,h,y0,lattice,verbose_f):
     '''
-    third order modified classical Runge-Kutta ODE solver
+    3rd order modified classical Runge-Kutta ODE solver
+    
+    This functions goes through each element and integrates the moment equations through a given quadrupole field profile
     '''
-    y = y0
-    tsteps = np.arange(t0,tfinal,h)
-    ii=0 # counter for quadprofile
         
-    yout = np.zeros((len(y0),len(tsteps)+1))
-    yout[:,0] = y
+    yout = np.array([]).reshape(len(y0),0)
+    tout = np.array([])
     
+    # integrate through each element one at a time, making sure to match the initial conditions at the boundary points of elements
+    for j,elem in enumerate(lattice):
     
-    # if verbose, same algorithm but with integration progress print outs
-    if verbose_f:
-        N = len(tsteps)
-        NN = int(N/10.0)
-        for i,t in enumerate(tsteps):
-            t1 = F(t,y,k[ii])
-            s1 = h*t1
-            t2 = F(t+h/2.0, y+s1/2.0, k[ii+1])
-            s2 = h*t2
-            t3 = F(t+h, y-s1+2.0*s2, k[ii+2])
-            s3 = h*t3
-            y = y + (s1 + 4.0*s2 + s3)/6.0
-            yout[:,i+1] = y 
-            ii+=2        
-            if i % NN == 0:
-                print(str(int(1.0*i/NN*10)) + '%')
-    else:
-        for i,t in enumerate(tsteps):
-            t1 = F(t,y,k[ii])
-            s1 = h*t1
-            t2 = F(t+h/2.0, y+s1/2.0, k[ii+1])
-            s2 = h*t2
-            t3 = F(t+h, y-s1+2.0*s2, k[ii+2])
-            s3 = h*t3
-            y = y + (s1 + 4.0*s2 + s3)/6.0
-            yout[:,i+1] = y
-            ii+=2
+        if verbose_f:
+            print("Integrating element: "+str(j+1))
             
-    return yout
+        # start, stop, and k value
+        t0 = elem[0]
+        t1 = elem[1]
+        k = elem[2]
+        tsteps = np.arange(t0,t1,h)
+        tout = np.concatenate((tout,tsteps))
+        
+        # initialize output values for this element
+        ytmp = np.zeros((len(y0),len(tsteps)+1)) # +1 for initial value
+        # initial conditions are the very last set of points integrated in the previous element (except for the starting element)
+        ytmp[:,0] = yout[:,-1] if (j > 0) else y0
+        
+        # run rk3 ode solver algorithm through the element
+        y = ytmp[:,0]        
+        for i,t in enumerate(tsteps):
+            t1 = F(t,y,elem[2])
+            s1 = h*t1
+            t2 = F(t+h/2.0, y+s1/2.0, elem[2])
+            s2 = h*t2
+            t3 = F(t+h, y-s1+2.0*s2, elem[2])
+            s3 = h*t3
+            y = y + (s1 + 4.0*s2 + s3)/6.0
+            ytmp[:,i+1] = y
+        
+        # append to main output before moving onto next element        
+        yout = np.concatenate((yout,ytmp),1) if (j==0) else np.concatenate((yout,ytmp[:,1:]),1)
+    
+    tout = np.concatenate((tout,np.array([tout[-1]+h])))  
+    return tout,yout
     
     
-def CreateQuadProfile(amplitude=1.0,qlength=0.1,dlength=0.1,numQuads=2,polarity=[1,-1],stepsize=0.01,verbose=False):
+def CreateLatticeProfile(amplitude=1.0,qlength=0.1,dlength=0.1,polarity=[1,-1],repeat=1,verbose=False):
     '''
     amplitude - quadrupole strength amplitude
     qlength - quadrupole length
     dlength - drift length inbetween quads
-    numQuads - number of quads
-    polarity - quad polarity
-    stepsize -    
+    repeat - number of times to repeat
+    polarity - quad polarity 
+    
+    the length of qlength, dlength, amplitude, polarity should be equal
+    
+    The arrays should follow the lattice pattern: drift length, quad length, drift length, quad length, etc...
+    note that either drift length or quad length can be zero. This way you can make patterns like drift-quad-quad-drift etc.
     '''
 
     # how many quads
-    numQuads = (int)(numQuads)
+    amplitude = np.tile(amplitude,repeat)
+    qlength = np.tile(qlength,repeat)
+    dlength = np.tile(dlength,repeat)
+    polarity = np.tile(polarity,repeat)        
     
-    ########################## setup arrays if needed
-    # setup amplitude array based on total quads
-    if (not isinstance(amplitude,(list,np.ndarray))):
-        amplitude = np.array([amplitude]*numQuads)
-    else:
-        if (len(amplitude) != numQuads):
-            # if the length of the array is shorter than # of quads, just repeat the pattern
-            if (isinstance(amplitude,list)):
-                amplitude = np.array(amplitude)
-            amplitude = np.tile(amplitude,(1+(int)(numQuads/len(amplitude))))            
-    # setup qlength array based on total quads
-    if (not isinstance(qlength,(list,np.ndarray))):
-        qlength = np.array([qlength]*numQuads)
-    else:
-        if (len(qlength) != numQuads):
-            # if the length of the array is shorter than # of quads, just repeat the pattern
-            if (isinstance(qlength,list)):
-                qlength = np.array(qlength)
-            qlength = np.tile(qlength,(1+(int)(numQuads/len(qlength))))          
-    # setup dlength array based on total quads 
-    if (not isinstance(dlength,(list,np.ndarray))):
-        dlength = np.array([dlength]*numQuads) 
-    else:
-        if (len(dlength) != numQuads):
-            # if the length of the array is shorter than # of quads, just repeat the pattern
-            if (isinstance(dlength,list)):
-                dlength = np.array(dlength)
-            dlength = np.tile(dlength,(1+(int)(numQuads/len(dlength))))         
-    # setup polarity array based on total quads
-    if (not isinstance(polarity,(list,np.ndarray))):
-        polarity = np.array([polarity]*numQuads)   
-    else:
-        if (len(polarity) != numQuads):
-            # if the length of the array is shorter than # of quads, just repeat the pattern
-            if (isinstance(polarity,list)):
-                polarity = np.array(polarity)
-            polarity = np.tile(polarity,(1+(int)(numQuads/len(polarity))))           
-                
+    # organize elements into three arrays, element start position, end position, and k value
     # organize into two arrays for the quad starting and ending positions
-    qLocations = np.zeros(numQuads*2)           
+    elemLocations = np.zeros(len(qlength) + len(dlength))
+             
     ii = 0
-    for i in range(numQuads):
-        qLocations[ii] = dlength[i]
+    for i in range(len(qlength)):
+        elemLocations[ii] = dlength[i]
         ii+=1
-        qLocations[ii] = qlength[i]
+        elemLocations[ii] = qlength[i]
         ii+=1
-    print(qLocations)
-    qLocations = np.cumsum(qLocations)
-    qStartLocations = qLocations[0::2]
-    qEndLocations = qLocations[1::2]
+    elemLocations = np.cumsum(elemLocations) # this list should always be even length, since we need a dlength for every qlength
+    
+    qStartLocations = elemLocations[0::2]
+    qEndLocations = elemLocations[1::2]
+    dStartLocations = np.concatenate(([0],elemLocations[1::2][0:-1]))
+    dEndLocations = elemLocations[0::2]
     
     ##########################
     if verbose:
@@ -160,30 +138,41 @@ def CreateQuadProfile(amplitude=1.0,qlength=0.1,dlength=0.1,numQuads=2,polarity=
         print(polarity)
         print(qStartLocations)
         print(qEndLocations)
+        print(dStartLocations)
+        print(dEndLocations)        
         print("\n")
-    ##########################        
-
-    # setup the length of our quadrupole pattern
-    zi = 0.0
-    ze = np.sum(qlength[0:numQuads]) + np.sum(dlength[0:numQuads])
-    z = np.arange(zi,round(ze,4)+stepsize,stepsize)
-    N = len(z)
-    k = np.zeros(N)
+    ##########################
     
-    ## iterate through z and fill in the quad values    
-    ii=0 # current quad index values
-    for i,zv in enumerate(z):
-        if (zv >= qStartLocations[ii] and zv <= qEndLocations[ii]):
-            k[i] = amplitude[ii]*polarity[ii]
-        elif (zv >= qEndLocations[ii]):
-            ii+=1      
-            if  (ii < numQuads and zv >= qStartLocations[ii] and zv <= qEndLocations[ii]):
-                k[i] = amplitude[ii]*polarity[ii]
-    # last value is the same as the first value (periodic)
-    k[-1] = k[0]
+    elemLatticeInfo = np.zeros((len(elemLocations),3))
+    
+    #
+    # element # | start location | end location | k value
+    ii=0
+    for i in range(len(qStartLocations)):
+        elemLatticeInfo[ii,0] = dStartLocations[i]
+        elemLatticeInfo[ii,1] = dEndLocations[i]
+        elemLatticeInfo[ii,2] = 0.0 # drift has no k value
+        ii+=1
+        elemLatticeInfo[ii,0] = qStartLocations[i]
+        elemLatticeInfo[ii,1] = qEndLocations[i]
+        elemLatticeInfo[ii,2] = amplitude[i]*polarity[i]
+        ii+=1                  
        
-    return z,k                    
-            
+    return elemLatticeInfo
+    
+def PlotLatticeProfile(lattice):                     
+    N,_ = lattice.shape
+    for ii,elem in enumerate(lattice):
+        if (elem[0] != elem[1]):
+            plt.plot([elem[0],elem[1]],[elem[2],elem[2]],color='k')
+            # connect previous element to current element
+            if (ii > 0 and ii < N): # no connecting first or last element
+                if (lattice[ii-1,0] != lattice[ii-1,1]):
+                    plt.plot([lattice[ii-1,1],lattice[ii,0]],[lattice[ii-1,2],lattice[ii,2]],color='k')          
+
+    plt.ylabel('$K_q$ (a.u.)')
+    plt.xlabel('Z position [m]')
+
     
     
 

@@ -2,21 +2,15 @@ import matplotlib.pyplot as plt
 from moment_equations_util import *
 
 # number of quads
-numQuads = 6
+repeat = 5
 
-amplitude = 1.0 # quadrupole amplitude
-qlength = [0.2] # quadrupole length
-dlength = 0.2 # drift space length
-polarity = [1,-1] # quadrupole polarity
-
-stepsize=0.01
+amplitude = [1.0,1.0,1.0] # quadrupole amplitude
+qlength = [0.05,0.1,0.05] # quadrupole length
+dlength = [0.0,0.2,0.2] # drift space length
+polarity = [1,-1,1] # quadrupole polarity
 
 
-z,y = CreateQuadProfile(amplitude,qlength,dlength,numQuads,polarity,stepsize)
+lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat)
+print(lattice)
 
-
-plt.figure()
-plt.plot(z,y)
-plt.ylabel('$K_q$ (a.u.)')
-plt.xlabel('Z position [m]')
-plt.show()
+PlotLatticeProfile(lattice)

@@ -3,22 +3,20 @@ from moment_equations_util import *
 import matplotlib.pyplot as plt
 
 ########################## ode solver settings
-h = 0.0001 # ode step size, make sure h << magnet thicknesses
+h = 0.00001 # ode step size, make sure h << magnet thicknesses
 
 
 ##########################  create magnet profile
 #number of quads
-numQuads = 12
+repeat = 2
 
-amplitude = 1.0*1e-3 # quadrupole amplitude
-qlength = [0.05,0.05] # quadrupole length
-dlength = [0.0, 0.2, 0.0, 0.2] # drift space length
-polarity = [1,-1,-1,1] # quadrupole polarity
+amplitude = [1.0*1e-3]*3 # quadrupole amplitude
+qlength = [0.05,0.1,0.05] # quadrupole length
+dlength = [0.0, 0.2, 0.2] # drift space length
+polarity = [1,-1,1] # quadrupole polarity
 
 stepsize=h/2.0 # step size - this needs to be half the integration step size
-zq,quadprofile = CreateQuadProfile(amplitude,qlength,dlength,numQuads,polarity,stepsize)
-
-z_interval=[0.0,zq[-1]] # length of integration (meters)
+lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat,verbose=True)
 
 ########################## physics settings
 physics_params = {'energy': 10e3, #eV
@@ -32,21 +30,28 @@ init_cond = Initial_conditions()
          
 
 # run integration
-z,y,motion = run_moments(init_cond, quadprofile, h, z_interval, physics_params, verbose=True)
+z,y,motion = run_moments(init_cond, lattice, h, physics_params, verbose=True)
 
 
 ##############################################################################
 # plot x^2 y^2 moments
+
 plt.figure()
+
+# plot moments
 xrms=1e6*(y[0,:]+y[1,:])
 yrms=1e6*(y[0,:]-y[1,:])
 plt.plot(z,xrms,color='C0',label='$\langle x^2 \\rangle$')
 plt.plot(z,yrms,color='C1',label='$\langle y^2 \\rangle$')
 
-kscale = (np.max(xrms) - np.min(xrms))/np.max(quadprofile)*0.25
+# plot quadrupole profile for reference
+kscale = (np.max(xrms) - np.min(xrms))/np.max(lattice[:,-1])*0.25
 koffset = np.max(xrms)*0.75
+lattice_scaled = np.copy(lattice)
+lattice_scaled[:,-1] = lattice_scaled[:,-1]*kscale+koffset
+plt.plot([],color='k',label='$K_q$')
+PlotLatticeProfile(lattice_scaled)
 
-plt.plot(zq,quadprofile*kscale+koffset,color='k',label='$K_q$')
 plt.legend()
 plt.grid(True)
 plt.show()

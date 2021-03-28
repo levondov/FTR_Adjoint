@@ -4,11 +4,11 @@ from moment_equations_util import *
 
 # Python version of Tom's Moment equations
 
-def run_moments(init_conditions, quadprofile, h, z_interval, physics_params,verbose=False):
+def run_moments(init_conditions, lattice, h, physics_params,verbose=False):
     '''
         INPUTS:
             init_conditions - initial conditions for the integration
-            quadprofile - magnet profile (continous)
+            lattice - magnet profile (from CreateLatticeProfile()
             h - integration step size
             z_interval - integration interval
             physics_params - list of physics params
@@ -21,12 +21,9 @@ def run_moments(init_conditions, quadprofile, h, z_interval, physics_params,verb
     
     # grab some more physics params
     physics_params["rigidity"], physics_params["perveance"] = Get_beamridg_and_perv(physics_params["energy"],physics_params["current"])  
-
-    # run forward integration of moment equations
-    z = np.arange(z_interval[0],z_interval[1]+h,h) # all steps
     
     odefunc = lambda z,Y,dbdx : ode_moments(z,Y,dbdx,physics_params)
-    y = ode3(odefunc,z_interval[0], h, z_interval[1], init_conditions, quadprofile, verbose_f=verbose)
+    z,y = ode3(odefunc, h, init_conditions, lattice, verbose_f=verbose)
 
     # Constant of Motion %
     motion = get_COM(y)

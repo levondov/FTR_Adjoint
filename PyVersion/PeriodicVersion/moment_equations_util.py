@@ -170,9 +170,6 @@ def PlotLatticeProfile(lattice):
                 if (lattice[ii-1,0] != lattice[ii-1,1]):
                     plt.plot([lattice[ii-1,1],lattice[ii,0]],[lattice[ii-1,2],lattice[ii,2]],color='k')          
 
-    plt.ylabel('$K_q$ (a.u.)')
-    plt.xlabel('Z position [m]')
-
     
     
 

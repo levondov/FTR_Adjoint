@@ -2,21 +2,18 @@ from moment_equations import *
 from moment_equations_util import *
 import matplotlib.pyplot as plt
 
-########################## ode solver settings
-h = 0.00001 # ode step size, make sure h << magnet thicknesses
-
-
 ##########################  create magnet profile
-#number of quads
-repeat = 2
+repeat = 2 # periodicity
 
-amplitude = [1.0*1e-3]*3 # quadrupole amplitude
-qlength = [0.05,0.1,0.05] # quadrupole length
-dlength = [0.0, 0.2, 0.2] # drift space length
+qstr = 0.02661
+ql = 0.05425
+
+amplitude = [qstr]*3 # quadrupole amplitude
+qlength = [ql/2.0,ql,ql/2.0] # quadrupole length
+dlength = [0.0, 0.025, 0.025] # drift space length
 polarity = [1,-1,1] # quadrupole polarity
 
-stepsize=h/2.0 # step size - this needs to be half the integration step size
-lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat,verbose=True)
+lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat,verbose=False)
 
 ########################## physics settings
 physics_params = {'energy': 10e3, #eV
@@ -30,6 +27,7 @@ init_cond = Initial_conditions()
          
 
 # run integration
+h = 0.0001 # ode step size, make sure h << magnet thicknesses
 z,y,motion = run_moments(init_cond, lattice, h, physics_params, verbose=True)
 
 
@@ -39,8 +37,8 @@ z,y,motion = run_moments(init_cond, lattice, h, physics_params, verbose=True)
 plt.figure()
 
 # plot moments
-xrms=1e6*(y[0,:]+y[1,:])
-yrms=1e6*(y[0,:]-y[1,:])
+xrms=(y[0,:]+y[1,:])
+yrms=(y[0,:]-y[1,:])
 plt.plot(z,xrms,color='C0',label='$\langle x^2 \\rangle$')
 plt.plot(z,yrms,color='C1',label='$\langle y^2 \\rangle$')
 
@@ -54,6 +52,8 @@ PlotLatticeProfile(lattice_scaled)
 
 plt.legend()
 plt.grid(True)
+plt.ylabel('moments $[m^2]$')
+plt.xlabel('Z position [m]')
 plt.show()
 
 # save results

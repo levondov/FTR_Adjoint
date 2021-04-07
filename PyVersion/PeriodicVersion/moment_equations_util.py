@@ -54,6 +54,7 @@ def ode3(F,h,y0,lattice,verbose_f):
         
     yout = np.array([]).reshape(len(y0),0)
     tout = np.array([])
+    kval = np.array([])
     
     # integrate through each element one at a time, making sure to match the initial conditions at the boundary points of elements
     for j,elem in enumerate(lattice):
@@ -67,6 +68,7 @@ def ode3(F,h,y0,lattice,verbose_f):
         k = elem[2]
         tsteps = np.arange(t0,t1,h)
         tout = np.concatenate((tout,tsteps))
+        kval = np.concatenate((kval,[k]*len(tsteps)))
         
         # initialize output values for this element
         ytmp = np.zeros((len(y0),len(tsteps)+1)) # +1 for initial value
@@ -87,9 +89,10 @@ def ode3(F,h,y0,lattice,verbose_f):
         
         # append to main output before moving onto next element        
         yout = np.concatenate((yout,ytmp),1) if (j==0) else np.concatenate((yout,ytmp[:,1:]),1)
-    
-    tout = np.concatenate((tout,np.array([tout[-1]+h])))  
-    return tout,yout
+
+    tout = np.concatenate((tout,np.array([tout[-1]+h])))
+    kval = np.concatenate((kval,np.array([k])))  
+    return tout,yout,kval
     
     
 def CreateLatticeProfile(amplitude=1.0,qlength=0.1,dlength=0.1,polarity=[1,-1],repeat=1,verbose=False):

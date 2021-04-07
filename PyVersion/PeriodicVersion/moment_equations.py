@@ -23,19 +23,19 @@ def run_moments(init_conditions, lattice, h, physics_params,verbose=False):
     physics_params["rigidity"], physics_params["perveance"] = Get_beamridg_and_perv(physics_params["energy"],physics_params["current"])  
     
     odefunc = lambda z,Y,dbdx : ode_moments(z,Y,dbdx,physics_params)
-    z,y = ode3(odefunc, h, init_conditions, lattice, verbose_f=verbose)
+    z,y,k = ode3(odefunc, h, init_conditions, lattice, verbose_f=verbose)
 
     # Constant of Motion %
     motion = get_COM(y)
     
-    return z,y,motion
+    return z,y,motion,k
     
 def run_moments_adjoint(init_conditions, lattice, h, physics_params,verbose=False):
     # grab some more physics params
     physics_params["rigidity"], physics_params["perveance"] = Get_beamridg_and_perv(physics_params["energy"],physics_params["current"])  
     
     odefunc = lambda z,Y,dbdx : ode_moments_adjoint(z,Y,dbdx,physics_params)
-    z,y = ode3(odefunc, h, init_conditions, lattice, verbose_f=verbose)
+    z,y,k = ode3(odefunc, h, init_conditions, lattice, verbose_f=verbose)
     
     y_mom = np.flip(y[11:,:],1)
     y_adj = np.flip(y[0:11,:],1)
@@ -43,7 +43,24 @@ def run_moments_adjoint(init_conditions, lattice, h, physics_params,verbose=Fals
     # Constant of Motion %
     motion = get_COM(y_mom)
     
-    return np.flip(z),y_mom,y_adj,motion    
+    return np.flip(z),y_mom,y_adj,motion, np.flip(k)
+    
+def calcON(Y, k_sol, k_quad, cq, sq, ab4, ca_ab4, sa_ab4, physics_params): 
+    '''
+    Helper function that calculates the O and N matrix
+    ''' 
+    # pipe radius calculation
+    pipe_constant = (8*physics_params["perveance"]/physics_params["pipe_radius"]**4) if physics_params["pipe_radius"] != 0 else 0 # zero pipe radius leads to infinity
+    
+    # O and N matrix calculations
+    O_mat = np.array([[-k_sol**2/2.0 + ab4*physics_params["perveance"], 2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -2.0*k_quad*sq + sa_ab4*physics_params["perveance"]],
+        [2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -k_sol**2/2.0 + ab4*physics_params["perveance"], 0],
+        [-2.0*k_quad*sq + sa_ab4*physics_params["perveance"], 0, -k_sol**2/2.0 + ab4*physics_params["perveance"]]]) + pipe_constant*np.array([ [0, -Y[1], -Y[2]],[-Y[1], 0, 0],[-Y[2], 0, 0] ])
+
+    N_mat = np.array([[0], [2.0*k_quad*sq - sa_ab4*physics_params["perveance"]], [2.0*k_quad*cq + ca_ab4*physics_params["perveance"]]])
+    - pipe_constant*np.array([[0], [-Y[2]], [Y[1]]]) # pipe radius image forces addition  
+    
+    return O_mat,N_mat
     
 def ode_moments(z,Y,quad_dbdx,physics_params):
     '''
@@ -78,16 +95,8 @@ def ode_moments(z,Y,quad_dbdx,physics_params):
     ca_ab4 = -Y[1] / ( (Y[0]+Q_delta)*Q_delta ) # 4c_alpha/ab
     sa_ab4 = -Y[2] / ( (Y[0]+Q_delta)*Q_delta ) # 4s_alpha/ab
     
-    # pipe radius calculation
-    pipe_constant = (8*physics_params["perveance"]/physics_params["pipe_radius"]**4) if physics_params["pipe_radius"] != 0 else 0 # zero pipe radius leads to infinity
-    
-    # O and N matrix calculations
-    O_mat = np.array([[-k_sol**2/2.0 + ab4*physics_params["perveance"], 2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -2.0*k_quad*sq + sa_ab4*physics_params["perveance"]],
-        [2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -k_sol**2/2.0 + ab4*physics_params["perveance"], 0],
-        [-2.0*k_quad*sq + sa_ab4*physics_params["perveance"], 0, -k_sol**2/2.0 + ab4*physics_params["perveance"]]]) + pipe_constant*np.array([ [0, -Y[1], -Y[2]],[-Y[1], 0, 0],[-Y[2], 0, 0] ])
-
-    N_mat = np.array([[0], [2.0*k_quad*sq - sa_ab4*physics_params["perveance"]], [2.0*k_quad*cq + ca_ab4*physics_params["perveance"]]])
-    - pipe_constant*np.array([[0], [-Y[2]], [Y[1]]]) # pipe radius image forces addition
+    # calculate O,N matrix
+    O_mat,N_mat = calcON(Y, k_sol, k_quad, cq, sq, ab4, ca_ab4, sa_ab4, physics_params)
     
     # System of 10 equations
     dydt = np.array([
@@ -135,16 +144,8 @@ def ode_moments_adjoint(z,Yt,quad_dbdx,physics_params):
     ca_ab4 = -Y2[1] / ( (Y2[0]+Q_delta)*Q_delta ) # 4c_alpha/ab
     sa_ab4 = -Y2[2] / ( (Y2[0]+Q_delta)*Q_delta ) # 4s_alpha/ab
     
-    # pipe radius calculation
-    pipe_constant = (8*physics_params["perveance"]/physics_params["pipe_radius"]**4) if physics_params["pipe_radius"] != 0 else 0 # zero pipe radius leads to infinity
-        
-    # O and N matrix calculations
-    O_mat = np.array([[-k_sol**2/2.0 + ab4*physics_params["perveance"], 2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -2.0*k_quad*sq + sa_ab4*physics_params["perveance"]],
-        [2.0*k_quad*cq + ca_ab4*physics_params["perveance"], -k_sol**2/2.0 + ab4*physics_params["perveance"], 0],
-        [-2.0*k_quad*sq + sa_ab4*physics_params["perveance"], 0, -k_sol**2/2.0 + ab4*physics_params["perveance"]]]) + pipe_constant*np.array([ [0, -Y2[1], -Y2[2]],[-Y2[1], 0, 0],[-Y2[2], 0, 0] ])
-
-    N_mat = np.array([[0], [2.0*k_quad*sq - sa_ab4*physics_params["perveance"]], [2.0*k_quad*cq + ca_ab4*physics_params["perveance"]]])
-    - pipe_constant*np.array([[0], [-Y2[2]], [Y2[1]]]) # pipe radius image forces addition
+    # calculate O,N matrix
+    O_mat,N_mat = calcON(Y2, k_sol, k_quad, cq, sq, ab4, ca_ab4, sa_ab4, physics_params)
     
     # Calculate special matrix due to space charge variations
     [Mq,Mp,Mn] = get_SCVM(Y2,physics_params)
@@ -171,17 +172,21 @@ def ode_moments_adjoint(z,Yt,quad_dbdx,physics_params):
     -1.0*k_sol/2.0
     ])
     
-    # dE dot (y)
-    dedot = np.matmul( np.reshape(Y[3:6], (1,3)), Mq )[0] + \
-        Y[9]*np.matmul( np.reshape(Y2[0:3], (1,3)), Mn )[0] - \
-        np.matmul( np.reshape(Y[0:3], (1,3)), Mp )[0] - \
-        Y2[9]*np.matmul( np.reshape(Y[0:3], (1,3)), Mn )[0] 
+    # dE dot 1 (y)
+    dedot1 = np.matmul( np.reshape(Y_adj[3:6,i], (1,3)), Mq )[0] + \
+        Y_adj[9,i]*np.matmul( np.reshape(Y[0:3,i], (1,3)), Mn )[0] - \
+        np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mp )[0] - \
+        Y[9,i]*np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mn )[0] 
+    # dE dot 2 (y)
+    dedot2 = np.array([0,0,0])
+    # dE dot total (y)
+    dedot = dedot1 + dedot2
     # dQ dot (y)
     dqdot = np.array([0,0,0])
     # dP dot (y)
     dpdot = np.array([0,0,0])
     # dL dot (y)
-    dldot = 0
+    dldot = 0 
     
     # Solve adjoint equations
     dydt2 = np.array([
@@ -215,59 +220,6 @@ def get_COM(y):
     motion = EQ + (0.5)*L**2 - (0.5)*PP
     
     return motion
-    
-def get_FOM1(y,k0,komega,physics_params,ynorm=None):
-    '''
-    calculates the Figure of Merit + adjoint equation initial conditions given a set of moment values
-    
-    i.e.
-    Given Q+,Q-,Qx,P+,P-,Px,E+,E-,Ex,L , calculate FOM:
-    
-    ynorm is if you want to normalize the FOM by something
-    '''        
-    
-    # figure of merit broken into pieces for ease of reading
-    FoM1 = 0.5*np.sum(y[3:6]**2)
-    FoM2 = 0.5*(k0**2)*(y[1]**2 + y[2]**2)
-    FoM3 = 0.5*(k0**(-2))*(y[7]**2+y[8]**2)
-    FoM4 = 0.5*(k0**(-2))*(y[6] - 0.5*(komega**2)*y[0] + physics_params["perveance"])**2
-    FoM5 = 0.5*(2*y[6]*y[0] - y[9]**2)**2
-    
-    if ynorm is not None:
-        # normalize
-        FoM1 = FoM1 / ((k0**2) * (ynorm[0]**2))
-        FoM2 = FoM2 / ((k0**2) * (ynorm[0]**2))
-        FoM3 = FoM3 / ((k0**2) * (ynorm[0]**2))
-        FoM4 = FoM4 / ((k0**2) * (ynorm[0]**2))
-        FoM5 = FoM5 / ((k0**2) * (ynorm[0]**2))
-        
-    FoM = FoM1 + FoM2 + FoM3 + FoM4 + FoM5
-    FoMp = np.array([FoM1,FoM2,FoM3,FoM4,FoM5])  
-          
-    return FoM,FoMp        
-        
-def get_dFOM1(y,k0,komega,physics_params):
-    '''
-    Calculate derivatives of FOM1 for initial conditions of the adjoint variables
-    '''        
-    k_perv = physics_params["perveance"]
-    # now calculate derivatives for adjoint variables
-    # adjoint variables calculated from FoM
-    dP_p = y[3]
-    dP_m = y[4]
-    dP_x = y[5]
-    
-    dE_p = k0**(-2)*(y[6]-0.5*komega**2*y[0]+k_perv)*0.5*komega**2 - 2*y[6]*(2*y[6]*y[0]-y[9]**2)
-    dE_m = -k0**(2)*y[1]
-    dE_x = -k0**(2)*y[2]
-    
-    dQ_p = -k0**(-2)*(y[6]-0.5*komega**2*y[0]+k_perv) - 2*y[0]*(2*y[6]*y[0]-y[9]**2)
-    dQ_m = -k0**(-2)*y[7]
-    dQ_x = -k0**(-2)*y[8]
-    
-    dL = -2*y[9]*( 2*y[6]*y[0]-y[9]**2 )
-    
-    return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL])
     
     
 def get_SCVM(Y,physics_params):
@@ -311,7 +263,102 @@ def get_SCVM(Y,physics_params):
 
     Mn = X1*U1t + X2*U2t + X3*U3t + X4*U4t
     
-    return Mq,Mp,Mn   
+    return Mq,Mp,Mn
+    
+def get_ON_and_ACT(z,Y,Y_adj,k,physics_params):
+    '''
+    Calculate O and N matrices as well as the adjoint changing variables (dQ,dP,dE,dL with dots over them) 
+    Note dEdot is actually dEdot_1 and dEdot_2, so 6 variables
+    '''
+
+    # grab some more physics params
+    physics_params["rigidity"], physics_params["perveance"] = Get_beamridg_and_perv(physics_params["energy"],physics_params["current"])  
+    
+    O = np.empty(len(z),dtype=object)
+    N = np.empty(len(z),dtype=object)
+    ACT = np.zeros((13,len(z)))
+        
+    for i in range(len(z)):
+        # quads
+        psi = 0.0
+        k_sol = 0.0
+        k_quad = k[i] / physics_params["rigidity"]
+                
+        # cq, sq quad calculations         
+        cq = np.cos(2.0*Y[10,i]-2.0*psi)
+        sq = np.sin(2.0*Y[10,i]-2.0*psi)
+        
+        # space charge calculation
+        Q_delta = np.sqrt( Y[0,i]**2 - Y[1,i]**2 - Y[2,i]**2 ) if Y[0,i]**2 - Y[1,i]**2 - Y[2,i]**2 >= 0 else 2**(-64.0)
+        ab4 = 1.0 / Q_delta; # the 4/ab term in equation
+        ca_ab4 = -Y[1,i] / ( (Y[0,i]+Q_delta)*Q_delta ) # 4c_alpha/ab
+        sa_ab4 = -Y[2,i] / ( (Y[0,i]+Q_delta)*Q_delta ) # 4s_alpha/ab
+        
+        # calculate O,N matrix
+        O_mat,N_mat = calcON(Y[:,i], k_sol, k_quad, cq, sq, ab4, ca_ab4, sa_ab4, physics_params)
+        
+        # Calculate special matrix due to space charge variations
+        [Mq,Mp,Mn] = get_SCVM(Y[:,i],physics_params)
+        
+        # dE dot 1 (y)
+        dedot1 = np.matmul( np.reshape(Y_adj[3:6,i], (1,3)), Mq )[0] + \
+            Y_adj[9,i]*np.matmul( np.reshape(Y[0:3,i], (1,3)), Mn )[0] - \
+            np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mp )[0] - \
+            Y[9,i]*np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mn )[0] 
+        # dE dot 2 (y)
+        dedot2 = np.array([0,0,0])
+        # dQ dot (y)
+        dqdot = np.array([0,0,0])
+        # dP dot (y)
+        dpdot = np.array([0,0,0])
+        # dL dot (y)
+        dldot = 0 
+        
+        ACT[0:3,i] = dqdot
+        ACT[3:6,i] = dpdot
+        ACT[6:9,i] = dedot1
+        ACT[9:12,i] = dedot2
+        ACT[12,i] = dldot
+        O[i] = O_mat
+        N[i] = N_mat  
+        
+    return O,N,ACT
+    
+def get_sensitivity_int(z,Y,Y_adj,ACT,O_per,N_per):
+    
+    # two integrals to calculate with 4 pieces in each integral
+    int1_1 = np.zeros(len(z))
+    int1_2 = np.copy(int1_1)
+    int1_2 = np.copy(int1_1)
+    int1_4 = np.copy(int1_1)
+    
+    int2_1 = np.copy(int1_1)
+    int2_2 = np.copy(int1_1)
+    int2_3 = np.copy(int1_1)
+    int2_4 = np.copy(int1_1)
+    
+    for i in range(z):       
+        
+        # calculate integral 1
+        int1_1[i] = np.dot( ACT[3:6,i], Y[3:6,i] )
+        int1_2[i] = -ACT[12,i]*Y[12,i]
+        int1_3[i] = -np.dot( ACT[9:12,i], Y[0:3,i] ) 
+        int1_4[i] = -np.dot( ACT[0:3,i], Y[6:9,i] )
+        
+        # calculate integral 2
+        int2_1[i] = np.dot( Y_adj[3:6,i], np.matmul( O_per,Y[0:3,i] ) )
+        int2_2[i] = np.dot( Y[0:3,i], N_per )*Y_adj[9,i]
+        int2_3[i] = -np.dot( Y_adj[0:3,i], np.matmul( O_per,Y[3:6,i] ) )
+        int2_4[i] = -np.dot( Y_adj[0:3,i], N_per )*Y[9,i]
+    
+    int_val = np.trapz(int1_1+int1_2+int1_3+int1_4,z) + np.trapz(int2_1+int2_2+int2_3+int2_4,z)
+    
+    return int_val
+    
+    
+    
+    
+    
     
     
     

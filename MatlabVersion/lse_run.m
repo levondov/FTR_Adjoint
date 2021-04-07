@@ -40,7 +40,7 @@ params = [0.213,0.863,15e-4,... % solenoid start, length, strength
 h=0.000001; % step size
 z_interval = [0.0,0.222]; % meters
 z = z_interval(1):h:z_interval(2);
-[y0] = ode3(@(t,Y) odefcn(t,Y,params), z_interval(1), h, z_interval(2), init_cond);
+[y] = ode3(@(t,Y) odefcn(t,Y,params), z_interval(1), h, z_interval(2), init_cond);
 
 % Constant of Motion %
 L = [y(:,10)];
@@ -53,7 +53,7 @@ dphi(end+1) = dphi(end);
 %y = lar2cart(y,dphi);
 
 lseplot(z(1:100:end),y(1:100:end,:),motion(1:100:end),'');
-stop
+
 % reverse integration check
 % [y2] = ode4(@(t,Y) odefcn(t,Y,params), z_interval(2), -h, z_interval(1), y(end,:)');
 % z2=z;

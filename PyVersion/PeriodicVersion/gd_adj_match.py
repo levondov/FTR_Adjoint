@@ -48,9 +48,9 @@ def Initial_conditions():
 def get_FOM(y):
     
     # figure of merit broken into pieces for ease of reading    
-    FoM1 = 0.5*np.sum( (y[0:3,-1]-y[0:3,0])**2 )
+    FoM1 = 0.5*np.sum( (y[0:3,-1]-y[0:3,0])**2 )*k0**2.
     FoM2 = 0.5*np.sum( (y[3:6,-1]-y[3:6,0])**2 )
-    FoM3 = 0.5*np.sum( (y[6:9,-1]-y[6:9,0])**2 )
+    FoM3 = 0.5*np.sum( (y[6:9,-1]-y[6:9,0])**2 )*k0**(-2.)
     FoM4 = 0.5*np.sum( (y[9,-1]-y[9,0])**2 )
         
     FoM = FoM1 + FoM2 + FoM3 + FoM4
@@ -61,17 +61,17 @@ def get_FOM(y):
 def get_dFOM(y):
     # derivative of FoM
     # dF/dQ
-    dQ_p = np.abs( y[0,-1]-y[0,0] )
-    dQ_m = np.abs( y[1,-1]-y[1,0] )
-    dQ_x = np.abs( y[2,-1]-y[2,0] )
+    dQ_p = ( y[0,-1]-y[0,0] )*k0**2.
+    dQ_m = ( y[1,-1]-y[1,0] )*k0**2.
+    dQ_x = ( y[2,-1]-y[2,0] )*k0**2.
     # dF/dP
-    dP_p = np.abs( y[3,-1]-y[3,0] )
-    dP_m = np.abs( y[4,-1]-y[4,0] )
-    dP_x = np.abs( y[5,-1]-y[5,0] )
+    dP_p = ( y[3,-1]-y[3,0] )
+    dP_m = ( y[4,-1]-y[4,0] )
+    dP_x = ( y[5,-1]-y[5,0] )
     # dF/dE
-    dE_p = np.abs( y[6,-1]-y[6,0] )
-    dE_m = np.abs( y[7,-1]-y[7,0] )
-    dE_x = np.abs( y[8,-1]-y[8,0] )
+    dE_p = ( y[6,-1]-y[6,0] )*k0**(-2.)
+    dE_m = ( y[7,-1]-y[7,0] )*k0**(-2.)
+    dE_x = ( y[8,-1]-y[8,0] )*k0**(-2.)
     # dF/dL
     dL = np.abs( y[9,-1]-y[9,0] )
     
@@ -85,19 +85,50 @@ def gd_FOM(an):
 def gd_adj(an):
     # run moment equations to get values at z=z_final
     init_cond = Initial_conditions()*an
-    z,y_m,motion = run_moments(init_cond, lattice, h, physics_params, verbose=True)
+    z,y_m,motion,_ = run_moments(init_cond, lattice, h, physics_params, verbose=True)
     
     # setup adjoint initial conditions @ z=z_final
     dF = get_dFOM(y_m)
-    init_cond_adj = np.array([ -dF[6],-dF[7],-dF[8],dF[3],dF[4],dF[5],-dF[0],-dF[1],-dF[2],dF[9],0 ])
+    init_cond_adj = np.array([ -dF[6],-dF[7],-dF[8],dF[3],dF[4],dF[5],-dF[0],-dF[1],-dF[2],-dF[9],0 ])
     init_cond_adj = np.concatenate(( init_cond_adj,np.reshape(y_m[:,-1].T,(11)) ))
     
     # Run adjoint equations backwards starting from z=z_final to z=0
-    z,y_mom,y_adj,motion = run_moments_adjoint(init_cond_adj, lattice_r, -h, physics_params, verbose=True)
+    z,y_mom,y_adj,motion,k = run_moments_adjoint(init_cond_adj, lattice_r, -h, physics_params, verbose=True)
     
-    return z,y_mom,y_adj,motion
+    return z,y_mom,y_adj,motion,k
+    
+#def gd_dFOM(an):
+    
 
-z,y,yadj,_ = gd_adj(np.ones(11))
+z,y,yadj,_,k = gd_adj(np.ones(11))
+O,N,ACT = get_ON_and_ACT(z,y,yadj,k,physics_params)
+
+plt.figure()
+plt.plot(z,k)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    

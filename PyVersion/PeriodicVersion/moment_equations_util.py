@@ -1,27 +1,6 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
-
-
-
-def Initial_conditions():
-    '''
-    return starting conditions for the moment equations (based off Santiago's values)
-    can be updated whenever.
-    '''
-    Q_plus = 0.5*(2.2581**2*1e-6 + 0.2258**2*1e-6)
-    Q_minus = 0.0
-    Q_x = 0.0
-    P_plus = 0
-    P_minus = 0
-    P_x = 0
-    E_plus = 0.0
-    E_minus = 0.0
-    E_x = 0
-    L = 0
-    phi = 0
-   
-    return np.array([Q_plus,Q_minus,Q_x,P_plus,P_minus,P_x,E_plus,E_minus,E_x,L,phi])
     
     
 def Get_beamridg_and_perv(energy=5e3,current=0.0):
@@ -94,6 +73,23 @@ def ode3(F,h,y0,lattice,verbose_f):
     kval = np.concatenate((kval,np.array([k])))  
     return tout,yout,kval
     
+def getLatticeKvsZ(lattice,h):
+    '''
+    returns K as a function of z
+    '''   
+    
+    kval = np.array([])
+    
+    for j,elem in enumerate(lattice):
+        # start, stop, and k value
+        t0 = elem[0]
+        t1 = elem[1]
+        k = elem[2]
+        tsteps = np.arange(t0,t1,h)
+        kval = np.concatenate((kval,[k]*len(tsteps)))   
+    kval = np.concatenate((kval,np.array([k])))
+    
+    return kval          
     
 def CreateLatticeProfile(amplitude=1.0,qlength=0.1,dlength=0.1,polarity=[1,-1],repeat=1,verbose=False):
     '''

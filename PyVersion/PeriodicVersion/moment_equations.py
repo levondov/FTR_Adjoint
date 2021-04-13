@@ -173,10 +173,10 @@ def ode_moments_adjoint(z,Yt,quad_dbdx,physics_params):
     ])
     
     # dE dot 1 (y)
-    dedot1 = np.matmul( np.reshape(Y_adj[3:6,i], (1,3)), Mq )[0] + \
-        Y_adj[9,i]*np.matmul( np.reshape(Y[0:3,i], (1,3)), Mn )[0] - \
-        np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mp )[0] - \
-        Y[9,i]*np.matmul( np.reshape(Y_adj[0:3,i], (1,3)), Mn )[0] 
+    dedot1 = np.matmul( np.reshape(Y[3:6], (1,3)), Mq )[0] + \
+        Y[9]*np.matmul( np.reshape(Y2[0:3], (1,3)), Mn )[0] - \
+        np.matmul( np.reshape(Y[0:3], (1,3)), Mp )[0] - \
+        Y2[9]*np.matmul( np.reshape(Y[0:3], (1,3)), Mn )[0] 
     # dE dot 2 (y)
     dedot2 = np.array([0,0,0])
     # dE dot total (y)

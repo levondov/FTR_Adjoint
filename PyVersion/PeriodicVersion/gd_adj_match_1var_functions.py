@@ -1,6 +1,5 @@
 from moment_equations_util import *
 from moment_equations import *
-import matplotlib.pyplot as plt
 
 # constants across functions
 k0 = 10
@@ -10,15 +9,16 @@ h = 0.0001 # ode step size, make sure h << magnet thicknesses
 physics_params = {'energy': 10e3, #eV
                     'current': 0.0, #Amps
                     'pipe_radius': 0.0 #meters
-                    }                   
-#############################################################
+                    }    
 
-def getLattice(an):
+def getLattice(an,periodicity=1):
+    qstr = 0.02661
+    ql = 0.05425
 
     qstr1,qstr2,qstr3 = an[0],an[1],an[2]
-    qlen1,qlen2,qlen3 = an[3],an[4],an[5]
-    dlen1,dlen2,dlen3 = an[6],an[7],an[8]
-    repeat = 2 # periodicity
+    qlen1,qlen2,qlen3 = ql/2.0,ql,ql/2.0
+    dlen1,dlen2,dlen3 = 0.0,0.025,0.025
+    repeat = periodicity # periodicity
 
     amplitude = [qstr1,qstr2,qstr3] # quadrupole amplitude
     qlength = [qlen1,qlen2,qlen3] # quadrupole length
@@ -97,8 +97,9 @@ def get_dFOM_X(y_adj):
     dE_x = -( y_adj[2,0]-y_adj[2,-1] )*k0**(1.)
     # dF/dX for dL
     dL = -( y_adj[9,0]-y_adj[9,-1] )
+    dphi = 0.0
     
-    return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL])  
+    return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL,dphi])  
     
 def get_dFOM_a(z,Y,Y_adj,O_per,N_per,ACT_per):
     # gradient of FOM_p with respect to "a" parameter
@@ -158,7 +159,7 @@ def gd_dFOM(a,X,z,y,y_adj,O_nope,N_nope,ACT_nope):
         lattice,_ = getLattice(a)
         k = getLatticeKvsZ(lattice,h)
         # calculate O,N perturbed matrices 
-        O,N,ACT = get_ON_and_ACT(z,y,yadj,k,physics_params)
+        O,N,ACT = get_ON_and_ACT(z,y,y_adj,k,physics_params)
         for j in range(len(z)):
             O[j] = O[j] - O_nope[j]
             N[j] = N[j] - N_nope[j]
@@ -186,72 +187,11 @@ def gd_adj(a,X):
     
     return z,y_mom,y_adj,motion,k
 
-#############################################################
+def PrintFoM(FoM):
+    print('FoM: '+str(FoM))
 
-# a and X parameters for lattice optimization                    
-qstr = 0.02661
-ql = 0.05425
-a0 = [qstr,qstr,qstr,ql/2.0,ql,ql/2.0,0.0,0.025,0.025]
-X0 = Initial_conditions()
+def RunMoments(lattice,init_cond):
     
-# compute adjoint equations
-z,y,yadj,_,k = gd_adj(a0,X0)
-O0,N0,ACT0 = get_ON_and_ACT(z,y,yadj,k,physics_params)
-
-# compute initial values for FoM
-[f0,f0p] = gd_FOM(a0,X0)
-f00 = f0
-
-# compute initial values for FoM derivatives w/ respect to X and a
-dfX0,dfa0 = gd_dFOM(a0,X0,z,y,yadj,O0,N0,ACT0)
-
-# scaling term for gd
-gamma_X0 = (f0/np.sum(dfX0**2))
-gamma_a0 = (f0/np.sum(dfa0**2))
-
-# setup variables for holding history of iterations
-gamma_h = np.reshape(gamma0,(1,1))
-a_h = np.reshape(a0.copy(),(1,len(a0)))
-X_h = np.reshape(X0.copy(),(1,len(X0)))
-f_h = np.reshape(f0,(1,1))
-dfX_h = np.reshape(dfX0.copy(),(1,len(dfX0)))
-dfa_h = np.reshape(dfa0.copy(),(1,len(dfa0)))
-
-
-# adjust starting gamma
-# iterate a
-a_t = a0 - gamma_a0*dfa0
-a_h = np.concatenate((a_h,np.reshape(a_t,(1,len(a_t))),axis=0))
-# iterate X
-X_t = X0 - gamma_X0*dfX0
-X_h = np.concatenate((X_h,np.reshape(X_t,(1,len(X_t))),axis=0))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-
+    # run moment equations
+    z,y,motion,k = run_moments(init_cond, lattice, h, physics_params, verbose=False)
+    return z,y,motion,k

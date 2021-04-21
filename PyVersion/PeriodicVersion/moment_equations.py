@@ -324,37 +324,6 @@ def get_ON_and_ACT(z,Y,Y_adj,k,physics_params):
         
     return O,N,ACT
     
-def get_sensitivity_int(z,Y,Y_adj,ACT,O_per,N_per):
-    
-    # two integrals to calculate with 4 pieces in each integral
-    int1_1 = np.zeros(len(z))
-    int1_2 = np.copy(int1_1)
-    int1_2 = np.copy(int1_1)
-    int1_4 = np.copy(int1_1)
-    
-    int2_1 = np.copy(int1_1)
-    int2_2 = np.copy(int1_1)
-    int2_3 = np.copy(int1_1)
-    int2_4 = np.copy(int1_1)
-    
-    for i in range(z):       
-        
-        # calculate integral 1
-        int1_1[i] = np.dot( ACT[3:6,i], Y[3:6,i] )
-        int1_2[i] = -ACT[12,i]*Y[12,i]
-        int1_3[i] = -np.dot( ACT[9:12,i], Y[0:3,i] ) 
-        int1_4[i] = -np.dot( ACT[0:3,i], Y[6:9,i] )
-        
-        # calculate integral 2
-        int2_1[i] = np.dot( Y_adj[3:6,i], np.matmul( O_per,Y[0:3,i] ) )
-        int2_2[i] = np.dot( Y[0:3,i], N_per )*Y_adj[9,i]
-        int2_3[i] = -np.dot( Y_adj[0:3,i], np.matmul( O_per,Y[3:6,i] ) )
-        int2_4[i] = -np.dot( Y_adj[0:3,i], N_per )*Y[9,i]
-    
-    int_val = np.trapz(int1_1+int1_2+int1_3+int1_4,z) + np.trapz(int2_1+int2_2+int2_3+int2_4,z)
-    
-    return int_val
-    
     
     
     

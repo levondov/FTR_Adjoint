@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
+from tabulate import tabulate
     
     
 def Get_beamridg_and_perv(energy=5e3,current=0.0):
@@ -167,12 +168,7 @@ def PlotLatticeProfile(lattice):
             # connect previous element to current element
             if (ii > 0 and ii < N): # no connecting first or last element
                 if (lattice[ii-1,0] != lattice[ii-1,1]):
-                    plt.plot([lattice[ii-1,1],lattice[ii,0]],[lattice[ii-1,2],lattice[ii,2]],color='k')          
-
-    
-    
-
-
+                    plt.plot([lattice[ii-1,1],lattice[ii,0]],[lattice[ii-1,2],lattice[ii,2]],color='k')
 
 
 

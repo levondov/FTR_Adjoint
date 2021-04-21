@@ -1,2 +1,4 @@
 data/
 PyVersion/data/
+PyVersion/PeriodicVersion/Data/
+*.pyc

@@ -183,6 +183,8 @@ def ode_moments_adjoint(z,Yt,quad_dbdx,physics_params):
     dedot = dedot1 + dedot2
     # dQ dot (y)
     dqdot = np.array([0,0,0])
+    if z == 0.0:
+        dqdot = np.array([2*Y2[0],0,0])
     # dP dot (y)
     dpdot = np.array([0,0,0])
     # dL dot (y)

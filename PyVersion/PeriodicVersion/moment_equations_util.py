@@ -25,7 +25,7 @@ def Get_beamridg_and_perv(energy=5e3,current=0.0):
     return rho,k_perv
 
 
-def ode3(F,h,y0,lattice,verbose_f):
+def ode3(F,h,y0,lattice,ACT=None,verbose_f=False):
     '''
     3rd order modified classical Runge-Kutta ODE solver
     

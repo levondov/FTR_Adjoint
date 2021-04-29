@@ -109,7 +109,7 @@ while True:
     if len(f_h[:,0]) > 5000:
         break
 
-SaveData("test",[a_h,f_h,dfa_h,gamma_h])
+SaveData("tests",[a_h,f_h,dfa_h,gamma_h])
 
 
 

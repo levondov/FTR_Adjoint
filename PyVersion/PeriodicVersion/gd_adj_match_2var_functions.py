@@ -49,7 +49,7 @@ def Initial_conditions():
     return np.array([Q_plus,Q_minus,Q_x,P_plus,P_minus,P_x,E_plus,E_minus,E_x,L,phi])
 
 # Pick a FoM and define functions
-def get_FOM(y):
+def get_FOMp(y):
     
     # figure of merit broken into pieces for ease of reading    
     FoM1 = 0.5*np.sum( (y[0:3,-1]-y[0:3,0])**2 )*k0**2.
@@ -61,8 +61,13 @@ def get_FOM(y):
     FoMp = np.array([FoM1,FoM2,FoM3,FoM4])  
           
     return FoM,FoMp        
+
+def get_FOMe(y):
+    FoM = y[0,0]**2
+
+    return FoM
         
-def get_dFOM(y):
+def get_dFOMp(y):
     # derivative of FoM with respect to Q,P,E,L
     # dF/dQ
     dQ_p = ( y[0,-1]-y[0,0] )*k0**2.
@@ -81,12 +86,30 @@ def get_dFOM(y):
     
     return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL])
 
-def get_dFOM_X(y_adj):
+def get_dFOMe(y):
+    # dF/dQ
+    dQdot_p = -2*y[0,0]
+    dQdot_m = 0.0
+    dQdot_x = 0.0
+    # dF/dP
+    dP_p = 0.0
+    dP_m = 0.0
+    dP_x = 0.0
+    # dF/dE
+    dE_p = 0.0
+    dE_m = 0.0
+    dE_x = 0.0
+    # dF/dL
+    dL = 0.0  
+
+    return np.array([dQdot_p,dQdot_m,dQdot_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL])
+
+def get_dFOMp_X(y_adj):
     # gradient of FOM_p with respect to X
     # dF/dX for dQ
     dQ_p = -( y_adj[6,0]-y_adj[6,-1] )*k0**(-1.)
-    dQ_m = -( y_adj[7,0]-y_adj[7,-1] )*k0
-    dQ_x = -( y_adj[8,0]-y_adj[8,-1] )*k0
+    dQ_m = -( y_adj[7,0]-y_adj[7,-1] )*k0**(-1.)
+    dQ_x = -( y_adj[8,0]-y_adj[8,-1] )*k0**(-1.)
     # dF/dX for dP
     dP_p = ( y_adj[3,0]-y_adj[3,-1] )
     dP_m = ( y_adj[4,0]-y_adj[4,-1] )
@@ -100,8 +123,28 @@ def get_dFOM_X(y_adj):
     dphi = 0.0
     
     return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL,dphi])  
+
+def get_dFOMe_X(y_adj):
+    # gradient of FOM_p with respect to X
+    # dF/dX for dQ
+    dQ_p = ( y_adj[6,0] )*k0**(-1.)
+    dQ_m = ( y_adj[7,0] )*k0**(-1.)
+    dQ_x = ( y_adj[8,0] )*k0**(-1.)
+    # dF/dX for dP
+    dP_p = -( y_adj[3,0] )
+    dP_m = -( y_adj[4,0] )
+    dP_x = -( y_adj[5,0] )
+    # dF/dX for dE
+    dE_p = ( y_adj[0,0] )*k0**(1.)
+    dE_m = ( y_adj[1,0] )*k0**(1.)
+    dE_x = ( y_adj[2,0] )*k0**(1.)
+    # dF/dX for dL
+    dL = ( y_adj[9,0] )
+    dphi = 0.0
     
-def get_dFOM_a(z,Y,Y_adj,O_per,N_per,ACT_per):
+    return np.array([dQ_p,dQ_m,dQ_x,dP_p,dP_m,dP_x,dE_p,dE_m,dE_x,dL,dphi])     
+    
+def get_dFOMp_a(z,Y,Y_adj,O_per,N_per,ACT_per):
     # gradient of FOM_p with respect to "a" parameter
     
     # two integrals to calculate with 4 pieces in each integral
@@ -132,19 +175,60 @@ def get_dFOM_a(z,Y,Y_adj,O_per,N_per,ACT_per):
     #int_val = np.trapz(int1_1+int1_2+int1_3+int1_4,z) + np.trapz(int2_1+int2_2+int2_3+int2_4,z)
     int_val = np.trapz(int2_1+int2_2+int2_3+int2_4,z)
     return int_val      
+
+def get_dFOMe_a(z,Y,Y_adj,O_per,N_per,ACT_per):
+    # gradient of FOM_p with respect to "a" parameter
     
-def gd_FOM(a,X):
+    # two integrals to calculate with 4 pieces in each integral
+    int1_1 = np.zeros(len(z))
+    int1_2 = np.copy(int1_1)
+    int1_3 = np.copy(int1_1)
+    int1_4 = np.copy(int1_1)
+    
+    int2_1 = np.copy(int1_1)
+    int2_2 = np.copy(int1_1)
+    int2_3 = np.copy(int1_1)
+    int2_4 = np.copy(int1_1)
+    
+    for i in range(len(z)):       
+        
+        # calculate integral 1
+        int1_1[i] = np.dot( ACT_per[3:6,i], Y[3:6,i] )
+        int1_2[i] = -ACT_per[12,i]*Y[9,i]
+        int1_3[i] = -np.dot( ACT_per[9:12,i], Y[0:3,i] ) 
+        int1_4[i] = -np.dot( ACT_per[0:3,i], Y[6:9,i] )
+        
+        # calculate integral 2
+        int2_1[i] = np.dot( Y_adj[3:6,i], np.matmul( O_per[i],Y[0:3,i] ) )
+        int2_2[i] = np.dot( Y[0:3,i], N_per[i] )*Y_adj[9,i]
+        int2_3[i] = -np.dot( Y_adj[0:3,i], np.matmul( O_per[i],Y[3:6,i] ) )
+        int2_4[i] = -np.dot( Y_adj[0:3,i], N_per[i] )*Y[9,i]
+    
+    #int_val = np.trapz(int1_1+int1_2+int1_3+int1_4,z) + np.trapz(int2_1+int2_2+int2_3+int2_4,z)
+    int_val = np.trapz(int2_1+int2_2+int2_3+int2_4,z)
+    return -int_val        
+    
+def gd_FOMp(a,X):
     # grab parameters
     init_cond = X
     lattice,_ = getLattice(a)
     
     # run moment equations
     z,y,motion,k = run_moments(init_cond, lattice, h, physics_params, verbose=False)
-    return get_FOM(y)
+    return get_FOMp(y)
+
+def gd_FOMe(a,X):
+    # grab parameters
+    init_cond = X
+    lattice,_ = getLattice(a)
+
+    # run moment equations
+    z,y,motion,k = run_moments(init_cond, lattice, h, physics_params, verbose=False)
+    return get_FOMe(y)    
     
-def gd_dFOM(a,X,z,y,y_adj,O_nope,N_nope,ACT_nope):    
+def gd_dFOMp(a,X,z,y,y_adj,O_nope,N_nope,ACT_nope):    
     ## get dF_p / dX , respect to initial conditions
-    dFOM_X = get_dFOM_X(y_adj)
+    dFOM_X = get_dFOMp_X(y_adj)
     
     ## get dF_p / da , respect to parameters    
     # init some variables
@@ -165,11 +249,39 @@ def gd_dFOM(a,X,z,y,y_adj,O_nope,N_nope,ACT_nope):
             N[j] = N[j] - N_nope[j]
             
         # calculate integral
-        dFOM_a[i] = get_dFOM_a(z,y,y_adj,O,N,ACT)
+        dFOM_a[i] = get_dFOMp_a(z,y,y_adj,O,N,ACT)
         
-    return dFOM_a,dFOM_X        
+    return dFOM_a,dFOM_X  
 
-def gd_adj(a,X):
+def gd_dFOMe(a,X,z,y,y_adj,O_nope,N_nope,ACT_nope):    
+    ## get dF_p / dX , respect to initial conditions
+    dFOM_X = get_dFOMe_X(y_adj)
+    
+    ## get dF_p / da , respect to parameters    
+    # init some variables
+    dFOM_a = np.zeros(len(a))
+    a_copy =  a.copy()
+    perturb = 0.001
+    import time
+    for i in range(len(a_copy)):
+        # perturb
+        a[i] = a_copy[i] + a_copy[i]*perturb
+        # grab updated lattice
+        lattice,_ = getLattice(a)
+        k = getLatticeKvsZ(lattice,h)
+        # calculate O,N perturbed matrices 
+        O,N,ACT = get_ON_and_ACT(z,y,y_adj,k,physics_params)
+        ACT[9:12,0] = np.array([2*y[0,0],0,0])
+        for j in range(len(z)):
+            O[j] = O[j] - O_nope[j]
+            N[j] = N[j] - N_nope[j]
+            
+        # calculate integral
+        dFOM_a[i] = get_dFOMe_a(z,y,y_adj,O,N,ACT)
+        
+    return dFOM_a,dFOM_X           
+
+def gd_adj_p(a,X):
     # grab parameters
     init_cond = X
     lattice,lattice_r = getLattice(a)
@@ -178,7 +290,7 @@ def gd_adj(a,X):
     z,y_m,motion,_ = run_moments(init_cond, lattice, h, physics_params, verbose=False)
     
     # setup adjoint initial conditions @ z=z_final
-    dF = get_dFOM(y_m)
+    dF = get_dFOMp(y_m)
     init_cond_adj = np.array([ -dF[6],-dF[7],-dF[8],dF[3],dF[4],dF[5],-dF[0],-dF[1],-dF[2],-dF[9],0 ])
     init_cond_adj = np.concatenate(( init_cond_adj,np.reshape(y_m[:,-1].T,(11)) ))
     
@@ -187,8 +299,26 @@ def gd_adj(a,X):
     
     return z,y_mom,y_adj,motion,k
 
-def PrintFoM(FoM):
-    print('FoM: '+str(FoM))
+def gd_adj_e(a,X):
+    # grab parameters
+    init_cond = X
+    lattice,lattice_r = getLattice(a)
+    
+    # run moment equations to get values at z=z_final
+    z,y_m,motion,_ = run_moments(init_cond, lattice, h, physics_params, verbose=False)
+    
+    # setup adjoint initial conditions @ z=z_final
+    dF = get_dFOMe(y_m)
+    init_cond_adj = np.array([ 0,0,0,0,0,0,0,0,0,0,0 ])
+    init_cond_adj = np.concatenate(( init_cond_adj,np.reshape(y_m[:,-1].T,(11)) ))
+    
+    # Run adjoint equations backwards starting from z=z_final to z=0
+    z,y_mom,y_adj,motion,k = run_moments_adjoint(init_cond_adj, lattice_r, -h, physics_params, verbose=False)
+    
+    return z,y_mom,y_adj,motion,k
+
+def PrintFoM(FoM,ss=''):
+    print('FoM_'+ss+': '+str(FoM))
 
 def RunMoments(lattice,init_cond):
     

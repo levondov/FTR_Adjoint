@@ -1,0 +1,400 @@
+\hypertarget{class_moments_1_1_moments}{}\doxysection{Moments.\+Moments Class Reference}
+\label{class_moments_1_1_moments}\index{Moments.Moments@{Moments.Moments}}
+
+
+The \mbox{\hyperlink{class_moments_1_1_moments}{Moments}} class solves the moment equations and adjoint equations.  
+
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_ae8a899562e13913fc8e23d655c7e7860}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{class_moments_1_1_moments_a7c582fa9c6b278ee7c369811c6ab7161}{energy}}=10e3, \mbox{\hyperlink{class_moments_1_1_moments_a44ea7dd3de87c880fc9c3f247fabd6b9}{current}}=0.\+0, \mbox{\hyperlink{class_moments_1_1_moments_a23aebbc7d19a9c9efa659d842b1ce35e}{pipe\+Radius}}=0.\+0, initial\+Moments=None)
+\begin{DoxyCompactList}\small\item\em instance attributes \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_a4b1df1c7fc83d0075b3c3ff9b1c6c3fd}{Create\+Lattice\+Profile}} (self, dB=\mbox{[}1.\+0\mbox{]}, qstart=\mbox{[}0.\+0\mbox{]}, qend=\mbox{[}0.\+1\mbox{]}, \mbox{\hyperlink{class_moments_1_1_moments_a793bb2fb558f7fadbc60906a1969b061}{zstart}}=0, \mbox{\hyperlink{class_moments_1_1_moments_ab4cccd9200d53adc584b18de23a95b1b}{zend}}=1, verbose=False)
+\begin{DoxyCompactList}\small\item\em Creates the lattice magnet profile that will be integrated. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_a2fe86817f05210566f7d705b5790c82d}{Run\+Moments}} (self, verbose=False)
+\begin{DoxyCompactList}\small\item\em Run the moment equations through the lattice. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_a8a503b786023113d8a961d66b69c889a}{Get\+COM}} (self, y)
+\begin{DoxyCompactList}\small\item\em Return the constant of motion (COM) from the moment equations. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a7c582fa9c6b278ee7c369811c6ab7161}{energy}}
+\begin{DoxyCompactList}\small\item\em Particle beam energy \mbox{[}eV\mbox{]}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a44ea7dd3de87c880fc9c3f247fabd6b9}{current}}
+\begin{DoxyCompactList}\small\item\em Particle beam current \mbox{[}A\mbox{]}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a23aebbc7d19a9c9efa659d842b1ce35e}{pipe\+Radius}}
+\begin{DoxyCompactList}\small\item\em Vacuum pipe radius \mbox{[}m\mbox{]}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a80ae50dbac8cb60d838f8f7b588207fe}{rigidity}}
+\begin{DoxyCompactList}\small\item\em Beam Rigidity. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a1d504874a1528ab354937e4d016929c1}{perveance}}
+\begin{DoxyCompactList}\small\item\em Beam perveance, a measure of space charge. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a7d87af93ca584ad1e7eb81b69264cc43}{lattice}}
+\begin{DoxyCompactList}\small\item\em Accelerator lattice variable. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a793bb2fb558f7fadbc60906a1969b061}{zstart}}
+\begin{DoxyCompactList}\small\item\em The starting z position of the lattice \mbox{[}m\mbox{]}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_ab4cccd9200d53adc584b18de23a95b1b}{zend}}
+\begin{DoxyCompactList}\small\item\em The ending z position of the lattice \mbox{[}m\mbox{]}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_a3be80c1eaf02b531d1c110ca36753b9d}{h}}
+\begin{DoxyCompactList}\small\item\em integration step size. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_moments_1_1_moments_af5d7b4ee30653d0c8243602ab2f7cea6}{initial\+Conditions}}
+\begin{DoxyCompactList}\small\item\em Initial moment values for the integration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_a0cdf64baf6d182f7c1e2dbfcf42e5025}{\+\_\+\+\_\+\+Get\+\_\+beamridg\+\_\+and\+\_\+perv}} (self, \mbox{\hyperlink{class_moments_1_1_moments_a7c582fa9c6b278ee7c369811c6ab7161}{energy}}=5e3, \mbox{\hyperlink{class_moments_1_1_moments_a44ea7dd3de87c880fc9c3f247fabd6b9}{current}}=0.\+0)
+\begin{DoxyCompactList}\small\item\em Calculates and returns the beam ridgidity and perveance. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_ab47ad3859a08368f63fc8345614970b9}{\+\_\+\+\_\+ode3}} (self, F, verbose=False)
+\begin{DoxyCompactList}\small\item\em The main integrator that solves the moment and adjoint equations. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}{\+\_\+\+\_\+ode\+\_\+moments}} (self, z, Y, dB)
+\begin{DoxyCompactList}\small\item\em Main function that solves the moment equations for all 10 moments. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_moments_1_1_moments_a65768ea8c9bed2d986f45590e5863bb7}{\+\_\+\+\_\+calc\+ON}} (self, Y, k\+\_\+sol, k\+\_\+quad, cq, sq, ab4, ca\+\_\+ab4, sa\+\_\+ab4)
+\begin{DoxyCompactList}\small\item\em Helper function for \mbox{\hyperlink{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}{\+\_\+\+\_\+ode\+\_\+moments()}} that calculates the O and N matrices in the moment equations See Tom\textquotesingle{}s notes for the definitions of these matrices. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \mbox{\hyperlink{class_moments_1_1_moments}{Moments}} class solves the moment equations and adjoint equations. 
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00014}{14}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_moments_1_1_moments_ae8a899562e13913fc8e23d655c7e7860}\label{class_moments_1_1_moments_ae8a899562e13913fc8e23d655c7e7860}} 
+\index{Moments.Moments@{Moments.Moments}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{energy = {\ttfamily 10e3},  }\item[{}]{current = {\ttfamily 0.0},  }\item[{}]{pipe\+Radius = {\ttfamily 0.0},  }\item[{}]{initial\+Moments = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+instance attributes 
+
+
+\begin{DoxyParams}{Parameters}
+{\em energy} & Beam energy \\
+\hline
+{\em current} & Beam current \\
+\hline
+{\em pipe\+Radius} & vacuum pipe radius used in image force calculations. A value of 0.\+0 means the image force calculation is ignored \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00020}{20}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_moments_1_1_moments_a65768ea8c9bed2d986f45590e5863bb7}\label{class_moments_1_1_moments_a65768ea8c9bed2d986f45590e5863bb7}} 
+\index{Moments.Moments@{Moments.Moments}!\_\_calcON@{\_\_calcON}}
+\index{\_\_calcON@{\_\_calcON}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{\_\_calcON()}{\_\_calcON()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+\_\+\+\_\+calc\+ON (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{Y,  }\item[{}]{k\+\_\+sol,  }\item[{}]{k\+\_\+quad,  }\item[{}]{cq,  }\item[{}]{sq,  }\item[{}]{ab4,  }\item[{}]{ca\+\_\+ab4,  }\item[{}]{sa\+\_\+ab4 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Helper function for \mbox{\hyperlink{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}{\+\_\+\+\_\+ode\+\_\+moments()}} that calculates the O and N matrices in the moment equations See Tom\textquotesingle{}s notes for the definitions of these matrices. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00272}{272}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a0cdf64baf6d182f7c1e2dbfcf42e5025}\label{class_moments_1_1_moments_a0cdf64baf6d182f7c1e2dbfcf42e5025}} 
+\index{Moments.Moments@{Moments.Moments}!\_\_Get\_beamridg\_and\_perv@{\_\_Get\_beamridg\_and\_perv}}
+\index{\_\_Get\_beamridg\_and\_perv@{\_\_Get\_beamridg\_and\_perv}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{\_\_Get\_beamridg\_and\_perv()}{\_\_Get\_beamridg\_and\_perv()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+\_\+\+\_\+\+Get\+\_\+beamridg\+\_\+and\+\_\+perv (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{energy = {\ttfamily 5e3},  }\item[{}]{current = {\ttfamily 0.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Calculates and returns the beam ridgidity and perveance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em energy} & The beam energy \mbox{[}eV\mbox{]} \\
+\hline
+{\em current} & The beam current \mbox{[}A\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00124}{124}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_ab47ad3859a08368f63fc8345614970b9}\label{class_moments_1_1_moments_ab47ad3859a08368f63fc8345614970b9}} 
+\index{Moments.Moments@{Moments.Moments}!\_\_ode3@{\_\_ode3}}
+\index{\_\_ode3@{\_\_ode3}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{\_\_ode3()}{\_\_ode3()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+\_\+\+\_\+ode3 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{F,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The main integrator that solves the moment and adjoint equations. 
+
+Based on a third order Runge-\/\+Kutta method This functions goes through each element and integrates the moment equations through a given quadrupole field profile
+
+
+\begin{DoxyParams}{Parameters}
+{\em F} & Reference to the function being solved, in this case \mbox{\hyperlink{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}{\+\_\+\+\_\+ode\+\_\+moments()}} \\
+\hline
+{\em verbose} & Print out verbose info while running the integration \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00158}{158}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}\label{class_moments_1_1_moments_ad7aa2201fd1b70fe2a892a1dc3c2a10d}} 
+\index{Moments.Moments@{Moments.Moments}!\_\_ode\_moments@{\_\_ode\_moments}}
+\index{\_\_ode\_moments@{\_\_ode\_moments}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{\_\_ode\_moments()}{\_\_ode\_moments()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+\_\+\+\_\+ode\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{z,  }\item[{}]{Y,  }\item[{}]{dB }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Main function that solves the moment equations for all 10 moments. 
+
+This should not be called directly. Only the integrator ode3() should be calling this as it is integrating through the equations
+
+
+\begin{DoxyParams}{Parameters}
+{\em z} & The z step to use \mbox{[}m\mbox{]} \\
+\hline
+{\em Y} & The value of the 10 moments at the particular z value \\
+\hline
+{\em dB} & The quadrupole gradient \mbox{[}T/m\mbox{]} at the particular z value\\
+\hline
+\end{DoxyParams}
+\begin{DoxyVerb}Main function that solves Tom's moment equations
+
+Y(1) - Q+
+Y(2) - Q-
+Y(3) - Qx
+Y(4) - P+
+Y(5) - P-
+Y(6) - Px
+Y(7) - E+
+Y(8) - E-
+Y(9) - Ex
+Y(10) - L\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00212}{212}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a4b1df1c7fc83d0075b3c3ff9b1c6c3fd}\label{class_moments_1_1_moments_a4b1df1c7fc83d0075b3c3ff9b1c6c3fd}} 
+\index{Moments.Moments@{Moments.Moments}!CreateLatticeProfile@{CreateLatticeProfile}}
+\index{CreateLatticeProfile@{CreateLatticeProfile}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{CreateLatticeProfile()}{CreateLatticeProfile()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+Create\+Lattice\+Profile (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{dB = {\ttfamily \mbox{[}1.0\mbox{]}},  }\item[{}]{qstart = {\ttfamily \mbox{[}0.0\mbox{]}},  }\item[{}]{qend = {\ttfamily \mbox{[}0.1\mbox{]}},  }\item[{}]{zstart = {\ttfamily 0},  }\item[{}]{zend = {\ttfamily 1},  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Creates the lattice magnet profile that will be integrated. 
+
+The lengths of dB, qstart, and qend should be equal. 
+\begin{DoxyParams}{Parameters}
+{\em dB} & The quadrupole magnet field gradient d\+B/dm \mbox{[}T/m\mbox{]} \\
+\hline
+{\em qstart} & The z start position for the quadrupole magnet \mbox{[}m\mbox{]} \\
+\hline
+{\em qend} & The z end position for the quadrupole magnet \mbox{[}m\mbox{]} \\
+\hline
+{\em zstart} & The z starting position of the lattice \mbox{[}m\mbox{]} \\
+\hline
+{\em zend} & The z ending position of the lattice \mbox{[}m\mbox{]} \\
+\hline
+{\em verbose} & Verbose diagnostics output \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00071}{71}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a8a503b786023113d8a961d66b69c889a}\label{class_moments_1_1_moments_a8a503b786023113d8a961d66b69c889a}} 
+\index{Moments.Moments@{Moments.Moments}!GetCOM@{GetCOM}}
+\index{GetCOM@{GetCOM}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{GetCOM()}{GetCOM()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+Get\+COM (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{y }\end{DoxyParamCaption})}
+
+
+
+Return the constant of motion (COM) from the moment equations. 
+
+See Tom\textquotesingle{}s notes
+
+
+\begin{DoxyParams}{Parameters}
+{\em y} & All 10 moment values at a particular z to calculate the constant of motion \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00145}{145}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a2fe86817f05210566f7d705b5790c82d}\label{class_moments_1_1_moments_a2fe86817f05210566f7d705b5790c82d}} 
+\index{Moments.Moments@{Moments.Moments}!RunMoments@{RunMoments}}
+\index{RunMoments@{RunMoments}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{RunMoments()}{RunMoments()}}
+{\footnotesize\ttfamily def Moments.\+Moments.\+Run\+Moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Run the moment equations through the lattice. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em verbose} & verbose diagnostics print statements \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00109}{109}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{class_moments_1_1_moments_a44ea7dd3de87c880fc9c3f247fabd6b9}\label{class_moments_1_1_moments_a44ea7dd3de87c880fc9c3f247fabd6b9}} 
+\index{Moments.Moments@{Moments.Moments}!current@{current}}
+\index{current@{current}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{current}{current}}
+{\footnotesize\ttfamily Moments.\+Moments.\+current}
+
+
+
+Particle beam current \mbox{[}A\mbox{]}. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00026}{26}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a7c582fa9c6b278ee7c369811c6ab7161}\label{class_moments_1_1_moments_a7c582fa9c6b278ee7c369811c6ab7161}} 
+\index{Moments.Moments@{Moments.Moments}!energy@{energy}}
+\index{energy@{energy}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{energy}{energy}}
+{\footnotesize\ttfamily Moments.\+Moments.\+energy}
+
+
+
+Particle beam energy \mbox{[}eV\mbox{]}. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00024}{24}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a3be80c1eaf02b531d1c110ca36753b9d}\label{class_moments_1_1_moments_a3be80c1eaf02b531d1c110ca36753b9d}} 
+\index{Moments.Moments@{Moments.Moments}!h@{h}}
+\index{h@{h}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{h}{h}}
+{\footnotesize\ttfamily Moments.\+Moments.\+h}
+
+
+
+integration step size. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00045}{45}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_af5d7b4ee30653d0c8243602ab2f7cea6}\label{class_moments_1_1_moments_af5d7b4ee30653d0c8243602ab2f7cea6}} 
+\index{Moments.Moments@{Moments.Moments}!initialConditions@{initialConditions}}
+\index{initialConditions@{initialConditions}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{initialConditions}{initialConditions}}
+{\footnotesize\ttfamily Moments.\+Moments.\+initial\+Conditions}
+
+
+
+Initial moment values for the integration. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00049}{49}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a7d87af93ca584ad1e7eb81b69264cc43}\label{class_moments_1_1_moments_a7d87af93ca584ad1e7eb81b69264cc43}} 
+\index{Moments.Moments@{Moments.Moments}!lattice@{lattice}}
+\index{lattice@{lattice}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{lattice}{lattice}}
+{\footnotesize\ttfamily Moments.\+Moments.\+lattice}
+
+
+
+Accelerator lattice variable. 
+
+See \mbox{\hyperlink{class_moments_1_1_moments_a4b1df1c7fc83d0075b3c3ff9b1c6c3fd}{Create\+Lattice\+Profile()}} 
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00038}{38}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a1d504874a1528ab354937e4d016929c1}\label{class_moments_1_1_moments_a1d504874a1528ab354937e4d016929c1}} 
+\index{Moments.Moments@{Moments.Moments}!perveance@{perveance}}
+\index{perveance@{perveance}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{perveance}{perveance}}
+{\footnotesize\ttfamily Moments.\+Moments.\+perveance}
+
+
+
+Beam perveance, a measure of space charge. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00032}{32}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a23aebbc7d19a9c9efa659d842b1ce35e}\label{class_moments_1_1_moments_a23aebbc7d19a9c9efa659d842b1ce35e}} 
+\index{Moments.Moments@{Moments.Moments}!pipeRadius@{pipeRadius}}
+\index{pipeRadius@{pipeRadius}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{pipeRadius}{pipeRadius}}
+{\footnotesize\ttfamily Moments.\+Moments.\+pipe\+Radius}
+
+
+
+Vacuum pipe radius \mbox{[}m\mbox{]}. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00028}{28}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a80ae50dbac8cb60d838f8f7b588207fe}\label{class_moments_1_1_moments_a80ae50dbac8cb60d838f8f7b588207fe}} 
+\index{Moments.Moments@{Moments.Moments}!rigidity@{rigidity}}
+\index{rigidity@{rigidity}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{rigidity}{rigidity}}
+{\footnotesize\ttfamily Moments.\+Moments.\+rigidity}
+
+
+
+Beam Rigidity. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00030}{30}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_ab4cccd9200d53adc584b18de23a95b1b}\label{class_moments_1_1_moments_ab4cccd9200d53adc584b18de23a95b1b}} 
+\index{Moments.Moments@{Moments.Moments}!zend@{zend}}
+\index{zend@{zend}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{zend}{zend}}
+{\footnotesize\ttfamily Moments.\+Moments.\+zend}
+
+
+
+The ending z position of the lattice \mbox{[}m\mbox{]}. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00042}{42}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+\mbox{\Hypertarget{class_moments_1_1_moments_a793bb2fb558f7fadbc60906a1969b061}\label{class_moments_1_1_moments_a793bb2fb558f7fadbc60906a1969b061}} 
+\index{Moments.Moments@{Moments.Moments}!zstart@{zstart}}
+\index{zstart@{zstart}!Moments.Moments@{Moments.Moments}}
+\doxysubsubsection{\texorpdfstring{zstart}{zstart}}
+{\footnotesize\ttfamily Moments.\+Moments.\+zstart}
+
+
+
+The starting z position of the lattice \mbox{[}m\mbox{]}. 
+
+
+
+Definition at line \mbox{\hyperlink{_moments_8py_source_l00040}{40}} of file \mbox{\hyperlink{_moments_8py_source}{Moments.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/levon/\+Downloads/\+FTR\+\_\+\+Adjoint/\+Py\+Version/\+Periodic\+Version/Moments.\+py\end{DoxyCompactItemize}

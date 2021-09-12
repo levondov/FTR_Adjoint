@@ -18,16 +18,16 @@ if hardedge_flag
     ql = 100;
     qs = [.01,.01,.01];
     prof_offset = 0;
-    ql = 516.4;
-    qs = [0.001936554068875,0.001936481932222,0.001936554068875];   
-    prof_offset = 0.02157;    
+    %ql = 516.4;
+    %qs = [0.001936554068875,0.001936481932222,0.001936554068875];   
+    %prof_offset = 0.02157;    
 else % for cos^2 profile
     ql = 500; %10x longer magnets
     qs = [.005,.005,.005]; %[0.8585,0.8363,1.1994];
     prof_offset = -0.00045;
 end
 %213
-params_o = [0.313,0.863,15e-4,... % solenoid start, length, strength
+params_o = [0.213,0.863,-15e-4,... % solenoid start, length, strength
     .00425+prof_offset,.0001*ql,-18.236*qs(1),... % quad 1 start, length, strength
     0.10655+prof_offset,0.0001*ql,21.3640*qs(2),... % quad 2 start, length, strength
     0.20895+prof_offset,0.0001*ql,-18.236*qs(3),... % quad 3 start, length, strength
@@ -40,7 +40,7 @@ params = [params_o(1)*a(1),params_o(2),params_o(3)*a(2),params_o(4)*a(3),params_
 %%
 % run integration to solve diff eqn.
 h=0.00001; % step size
-z_interval = [0.0,0.362]; % meters 0.222
+z_interval = [0.0, 0.722]; %[0.0,0.322]; % meters 0.222
 z = z_interval(1):h:z_interval(2);
 [y] = ode3(@(t,Y) odefcn(t,Y,params), z_interval(1), h, z_interval(2), init_cond);
 
@@ -55,30 +55,8 @@ motion = EQ + (1/2)*L.^2 - (1/2)*PP;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 % calculate adjoint related variables
-dPy = zeros(3,length(z));
-dEy = zeros(3,length(z));
-dQy = zeros(3,length(z));
-dLy = zeros(1,length(z));
-
-global k_solv k0 k_solvv
-komega=max(k_solvv);
 i=length(z);
-if 1
-    % adjoint variables calculated from FoM
-    dPy(:,i) = y(i,4:6);
-    dEy(1,i) = k0^(-2)*(y(i,7)-0.5*komega^2*y(i,1)+k_perv)*0.5*komega^2 - 2*y(i,7)*(2*y(i,7)*y(i,1)-y(i,10)^2);
-    dEy(2,i) = -k0^(2)*y(i,2);
-    dEy(3,i) = -k0^(2)*y(i,3);
-    dQy(1,i) = -k0^(-2)*(y(i,7)-0.5*komega^2*y(i,1)+k_perv) - 2*y(i,1)*(2*y(i,7)*y(i,1)-y(i,10)^2);
-    dQy(2,i) = -k0^(-2)*y(i,8);
-    dQy(3,i) = -k0^(-2)*y(i,9);
-    dLy(:,i) = -2*y(i,10)*(2*y(i,7)*y(i,1)-y(i,10)^2);   
-else
-    k0=1;
-   dEy(1,i) = -0.5*komega^4 * y(i,1);
-   dEy(2,i) = -y(i,2);
-   dEy(3,i) = -y(i,3);
-end
+[~,~,dQy, dPy, dEy, dLy] = get_F_and_dF(y,i);
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

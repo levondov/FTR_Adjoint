@@ -2,38 +2,41 @@
 %%
 %
 %
-%
+% example
 
 % Gradient descent with adjoint stuff
-global k_perv k0 hardedge_flag
-k_perv = c2perv(0.0);
-k0 = 10;
+global k_perv k0 hardedge_flag e1 e2
+k_perv = c2perv(5.0e-3);
+k0 = 7;
+e1 = 0.0;
+e2 = 1.0;
 hardedge_flag = 1;
 flag_noangle = 0;
 flag_nosoldmove = 1;
 
 %an = [1.40, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
+%1.020022195126994
 
 an = [
-   0.890961137771436
-   1.040112392347826
-   1.005315249732794
-   0.963045965402495
-   1.010693472702954
-   1.092952197480941
-   1.032513719992683
-   1.049444269401119
-   1.014993157893851
-   1.114191604334464
-   1.061949219824596]';    
+   1.141197183085769
+   1.240381289920853
+   0.971670502689810
+   1.099600025476628
+   1.210342963351092
+   1.146908990747882
+   1.080218196594953
+   1.002807847180152
+   1.067835788684638
+   0.988742610685236
+   1.042335063188109]';      
 
-%an(1) = 1.0;
+%an = [1.15, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
 
 if flag_noangle
     an(9:11) = 1.0;
 end
 if flag_nosoldmove
-    an(1) = 1.0;
+    an(1) = 1.10;
 end
 
 %an = ones(1,11); an(1) = 1.10;
@@ -54,7 +57,8 @@ gamma_h = gamma;
 an_h = an; 
 f_h = f0; 
 fp_h = f0p;
-df_h =df0; 
+df_h =df0;
+
 
 % adjust starting gamma
 an_h(end+1,:) = an - gamma_h(end)*df0'; % iterate
@@ -91,7 +95,7 @@ while 1
             an_h(end,9:11) = 1; %% ANGLE
         end
         if flag_nosoldmove
-            an_h(end,1) = an(1);
+            an_h(end,1) = an(1);            
         end
         
         % compute fom
@@ -148,7 +152,7 @@ while 1
     % calculate learning rate
     %gamma_h(:,end+1) = gamma;
     
-    if f_h(end) < 6e-14
+    if f_h(end) < 1e-15
        break; 
     end
     if length(f_h) > 5000

@@ -1,0 +1,22 @@
+\hypertarget{quadprofile__tests_8py_source}{}\doxysection{quadprofile\+\_\+tests.\+py}
+\label{quadprofile__tests_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/quadprofile\_tests.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/quadprofile\_tests.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00001}00001 \textcolor{keyword}{import} matplotlib.pyplot \textcolor{keyword}{as} plt}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00002}00002 \textcolor{keyword}{from} moment\_equations\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00003}00003 }
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00004}00004 \textcolor{comment}{\# number of quads}}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00005}00005 repeat = 5}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00006}00006 }
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00007}00007 amplitude = [1.0,1.0,1.0] \textcolor{comment}{\# quadrupole amplitude}}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00008}00008 qlength = [0.05,0.1,0.05] \textcolor{comment}{\# quadrupole length}}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00009}00009 dlength = [0.0,0.2,0.2] \textcolor{comment}{\# drift space length}}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00010}00010 polarity = [1,-\/1,1] \textcolor{comment}{\# quadrupole polarity}}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00012}00012 }
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00013}00013 lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat)}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00014}00014 print(lattice)}
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{quadprofile__tests_8py_source_l00016}00016 PlotLatticeProfile(lattice)}
+
+\end{DoxyCode}

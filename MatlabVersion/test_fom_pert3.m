@@ -1,5 +1,5 @@
 global k_perv k0 hardedge_flag norm_flag
-norm_flag = 1;
+norm_flag = 0;
 k0 = 10;
 hardedge_flag = 1;
 
@@ -21,7 +21,7 @@ a = [
 fom_base = gd_F(a);
 
 global k0 k_solvv norm_flag
-norm_flag = 1
+norm_flag = 0
 NN = 20;
 pert_s = linspace(0.50,1.50,NN);
 pert_v = linspace(0.75,1.25,NN);

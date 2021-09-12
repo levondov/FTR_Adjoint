@@ -1,5 +1,9 @@
-function [init_cond] = lseinit()
+function [init_cond] = lseinit(epp,emp)
 
+if nargin == 0
+    epp = 0;
+    emp = 0;
+end
 % Create starting distribution with 10k particles
 [x0,y0,xp0,yp0] = createdistribution(10000);
 % x0 y0 xp0 yp0
@@ -66,8 +70,12 @@ if 1 % using santiago values
    %E_minus_sim = 6.9849e-05;
    E_x_sim = 0;
    L_sim = 0;
-    
 end
+
+E_plus_sim = E_plus_sim + E_plus_sim*epp;
+E_minus_sim = E_minus_sim + E_minus_sim*emp;
+%E_plus_sim = E_plus_sim + E_plus_sim*-0.05;
+%E_minus_sim = E_minus_sim + E_minus_sim*0.05;
 
 y_sim = [Q_plus_sim,Q_minus_sim,Q_x_sim,P_plus_sim,P_minus_sim,P_x_sim,E_plus_sim,E_minus_sim,E_x_sim,L_sim];
 

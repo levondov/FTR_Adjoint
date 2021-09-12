@@ -1,0 +1,48 @@
+\hypertarget{analysis__util_8py_source}{}\doxysection{analysis\+\_\+util.\+py}
+\label{analysis__util_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/analysis\_util.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/analysis\_util.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00001}00001 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00002}00002 \textcolor{keyword}{import} scipy \textcolor{keyword}{as} sp}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00003}00003 \textcolor{keyword}{import} matplotlib.pyplot \textcolor{keyword}{as} plt}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00004}00004 \textcolor{keyword}{from} tabulate \textcolor{keyword}{import} tabulate}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00005}00005 \textcolor{keyword}{from} moment\_equations\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00006}00006 \textcolor{keyword}{from} moment\_equations \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00007}00007 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00008}00008 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00009}00009 \textcolor{keyword}{def }PrintTable(ary):}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00010}00010     table = tabulate(ary)}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00011}00011     print(table)}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00012}00012 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00013}00013 \textcolor{keyword}{def }SaveData(fname,ary):}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00014}00014     np.save(\textcolor{stringliteral}{"{}Data/"{}}+fname,ary)}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00016}00016 \textcolor{keyword}{def }LoadData(fname):}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00017}00017     \textcolor{keywordflow}{return} np.load(\textcolor{stringliteral}{"{}Data/"{}}+fname+\textcolor{stringliteral}{"{}.npy"{}},allow\_pickle=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00018}00018 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00019}00019 \textcolor{keyword}{def }PlotMoments(z,y,k,fig=None,ax=None,colors=None,linestyles=None):}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00020}00020     \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} fig \textcolor{keywordflow}{or} \textcolor{keywordflow}{not} ax:}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00021}00021         fig, ax = plt.subplots()}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00022}00022     \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} colors:}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00023}00023         colors = [\textcolor{stringliteral}{'C0'},\textcolor{stringliteral}{'C1'}]}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00024}00024     \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} linestyles:}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00025}00025         linestyles = [\textcolor{stringliteral}{'-\/'},\textcolor{stringliteral}{'-\/'}]}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00026}00026 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00027}00027     \textcolor{comment}{\# plot moments}}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00028}00028     xrms=(y[0,:]+y[1,:])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00029}00029     yrms=(y[0,:]-\/y[1,:])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00030}00030     ax.plot(z,xrms,label=\textcolor{stringliteral}{'\$\(\backslash\)langle x\string^2 \(\backslash\)\(\backslash\)rangle\$'},color=colors[0],linestyle=linestyles[0])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00031}00031     ax.plot(z,yrms,label=\textcolor{stringliteral}{'\$\(\backslash\)langle y\string^2 \(\backslash\)\(\backslash\)rangle\$'},color=colors[1],linestyle=linestyles[1])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00032}00032 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00033}00033     ax.legend()}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00034}00034     ax.grid(\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00035}00035     ax.set\_ylabel(\textcolor{stringliteral}{'moments \$[m\string^2]\$'})}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00036}00036     ax.set\_xlabel(\textcolor{stringliteral}{'Z position [m]'})    }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00037}00037 }
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00038}00038     \textcolor{comment}{\# plot k values}}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00039}00039     ax2 = ax.twinx()}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00040}00040     ax2.plot(z,k,color=\textcolor{stringliteral}{'k'},linestyle=linestyles[0])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00041}00041     ax2.set\_ylim([-\/0.05,0.05])}
+\DoxyCodeLine{\Hypertarget{analysis__util_8py_source_l00042}00042     ax2.set\_yticklabels([])}
+
+\end{DoxyCode}

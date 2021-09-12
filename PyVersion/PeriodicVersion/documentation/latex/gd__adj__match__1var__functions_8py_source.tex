@@ -1,0 +1,202 @@
+\hypertarget{gd__adj__match__1var__functions_8py_source}{}\doxysection{gd\+\_\+adj\+\_\+match\+\_\+1var\+\_\+functions.\+py}
+\label{gd__adj__match__1var__functions_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/gd\_adj\_match\_1var\_functions.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/gd\_adj\_match\_1var\_functions.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00001}00001 \textcolor{keyword}{from} moment\_equations\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00002}00002 \textcolor{keyword}{from} moment\_equations \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00003}00003 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00004}00004 \textcolor{comment}{\# constants across functions}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00005}00005 k0 = 10}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00006}00006 h = 0.0001 \textcolor{comment}{\# ode step size, make sure h << magnet thicknesses}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00007}00007 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00008}00008 \textcolor{comment}{\#physics settings}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00009}00009 physics\_params = \{\textcolor{stringliteral}{'energy'}: 10e3, \textcolor{comment}{\#eV}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00010}00010                     \textcolor{stringliteral}{'current'}: 1.0e-\/4, \textcolor{comment}{\#Amps}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00011}00011                     \textcolor{stringliteral}{'pipe\_radius'}: 0.0 \textcolor{comment}{\#meters}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00012}00012                     \}    }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00013}00013 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00014}00014 \textcolor{keyword}{def }getLattice(an,periodicity=1):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00015}00015     qstr = 0.02661}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00016}00016     ql = 0.05425}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00017}00017 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00018}00018     qstr1,qstr2,qstr3 = an[0],an[1],an[2]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00019}00019     qlen1,qlen2,qlen3 = ql/2.0,ql,ql/2.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00020}00020     dlen1,dlen2,dlen3 = 0.0,0.025,0.025}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00021}00021     repeat = periodicity \textcolor{comment}{\# periodicity}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00022}00022 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00023}00023     amplitude = [qstr1,qstr2,qstr3] \textcolor{comment}{\# quadrupole amplitude}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00024}00024     qlength = [qlen1,qlen2,qlen3] \textcolor{comment}{\# quadrupole length}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00025}00025     dlength = [dlen1,dlen2,dlen3] \textcolor{comment}{\# drift space length}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00026}00026     polarity = [1,-\/1,1] \textcolor{comment}{\# quadrupole polarity}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00027}00027 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00028}00028     lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat,verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00029}00029     \textcolor{comment}{\# reverse lattice for adj}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00030}00030     lattice\_r = np.copy(lattice)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00031}00031     lattice\_r[:,[0,1]] = lattice\_r[:,[1,0]]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00032}00032     lattice\_r = np.flip(lattice\_r,0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00033}00033     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00034}00034     \textcolor{keywordflow}{return} lattice,lattice\_r}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00035}00035 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00036}00036 \textcolor{keyword}{def }Initial\_conditions():}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00037}00037     Q\_plus = 0.5*(2.2581**2*1e-\/6 + 0.2258**2*1e-\/6)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00038}00038     Q\_minus = 0.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00039}00039     Q\_x = 0.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00040}00040     P\_plus = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00041}00041     P\_minus = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00042}00042     P\_x = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00043}00043     E\_plus = 0.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00044}00044     E\_minus = 0.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00045}00045     E\_x = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00046}00046     L = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00047}00047     phi = 0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00048}00048    }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00049}00049     \textcolor{keywordflow}{return} np.array([Q\_plus,Q\_minus,Q\_x,P\_plus,P\_minus,P\_x,E\_plus,E\_minus,E\_x,L,phi])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00050}00050 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00051}00051 \textcolor{comment}{\# Pick a FoM and define functions}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00052}00052 \textcolor{keyword}{def }get\_FOM(y):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00053}00053     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00054}00054     \textcolor{comment}{\# figure of merit broken into pieces for ease of reading    }}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00055}00055     FoM1 = 0.5*np.sum( (y[0:3,-\/1]-\/y[0:3,0])**2 )*k0**2.}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00056}00056     FoM2 = 0.5*np.sum( (y[3:6,-\/1]-\/y[3:6,0])**2 )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00057}00057     FoM3 = 0.5*np.sum( (y[6:9,-\/1]-\/y[6:9,0])**2 )*k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00058}00058     FoM4 = 0.5*np.sum( (y[9,-\/1]-\/y[9,0])**2 )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00059}00059         }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00060}00060     FoM = FoM1 + FoM2 + FoM3 + FoM4}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00061}00061     FoMp = np.array([FoM1,FoM2,FoM3,FoM4])  }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00062}00062           }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00063}00063     \textcolor{keywordflow}{return} FoM,FoMp        }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00064}00064         }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00065}00065 \textcolor{keyword}{def }get\_dFOM(y):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00066}00066     \textcolor{comment}{\# derivative of FoM with respect to Q,P,E,L}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00067}00067     \textcolor{comment}{\# dF/dQ}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00068}00068     dQ\_p = ( y[0,-\/1]-\/y[0,0] )*k0**2.}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00069}00069     dQ\_m = ( y[1,-\/1]-\/y[1,0] )*k0**2.}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00070}00070     dQ\_x = ( y[2,-\/1]-\/y[2,0] )*k0**2.}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00071}00071     \textcolor{comment}{\# dF/dP}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00072}00072     dP\_p = ( y[3,-\/1]-\/y[3,0] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00073}00073     dP\_m = ( y[4,-\/1]-\/y[4,0] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00074}00074     dP\_x = ( y[5,-\/1]-\/y[5,0] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00075}00075     \textcolor{comment}{\# dF/dE}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00076}00076     dE\_p = ( y[6,-\/1]-\/y[6,0] )*k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00077}00077     dE\_m = ( y[7,-\/1]-\/y[7,0] )*k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00078}00078     dE\_x = ( y[8,-\/1]-\/y[8,0] )*k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00079}00079     \textcolor{comment}{\# dF/dL}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00080}00080     dL = np.abs( y[9,-\/1]-\/y[9,0] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00081}00081     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00082}00082     \textcolor{keywordflow}{return} np.array([dQ\_p,dQ\_m,dQ\_x,dP\_p,dP\_m,dP\_x,dE\_p,dE\_m,dE\_x,dL])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00083}00083 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00084}00084 \textcolor{keyword}{def }get\_dFOM\_X(y\_adj):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00085}00085     \textcolor{comment}{\# gradient of FOM\_p with respect to X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00086}00086     \textcolor{comment}{\# dF/dX for dQ}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00087}00087     dQ\_p = -\/( y\_adj[6,0]-\/y\_adj[6,-\/1] )*k0**(-\/1.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00088}00088     dQ\_m = -\/( y\_adj[7,0]-\/y\_adj[7,-\/1] )*k0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00089}00089     dQ\_x = -\/( y\_adj[8,0]-\/y\_adj[8,-\/1] )*k0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00090}00090     \textcolor{comment}{\# dF/dX for dP}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00091}00091     dP\_p = ( y\_adj[3,0]-\/y\_adj[3,-\/1] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00092}00092     dP\_m = ( y\_adj[4,0]-\/y\_adj[4,-\/1] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00093}00093     dP\_x = ( y\_adj[5,0]-\/y\_adj[5,-\/1] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00094}00094     \textcolor{comment}{\# dF/dX for dE}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00095}00095     dE\_p = -\/( y\_adj[0,0]-\/y\_adj[0,-\/1] )*k0**(1.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00096}00096     dE\_m = -\/( y\_adj[1,0]-\/y\_adj[1,-\/1] )*k0**(1.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00097}00097     dE\_x = -\/( y\_adj[2,0]-\/y\_adj[2,-\/1] )*k0**(1.)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00098}00098     \textcolor{comment}{\# dF/dX for dL}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00099}00099     dL = -\/( y\_adj[9,0]-\/y\_adj[9,-\/1] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00100}00100     dphi = 0.0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00101}00101     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00102}00102     \textcolor{keywordflow}{return} np.array([dQ\_p,dQ\_m,dQ\_x,dP\_p,dP\_m,dP\_x,dE\_p,dE\_m,dE\_x,dL,dphi])  }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00103}00103     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00104}00104 \textcolor{keyword}{def }get\_dFOM\_a(z,Y,Y\_adj,O\_per,N\_per,ACT\_per):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00105}00105     \textcolor{comment}{\# gradient of FOM\_p with respect to "{}a"{} parameter}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00106}00106     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00107}00107     \textcolor{comment}{\# two integrals to calculate with 4 pieces in each integral}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00108}00108     int1\_1 = np.zeros(len(z))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00109}00109     int1\_2 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00110}00110     int1\_3 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00111}00111     int1\_4 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00112}00112     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00113}00113     int2\_1 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00114}00114     int2\_2 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00115}00115     int2\_3 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00116}00116     int2\_4 = np.copy(int1\_1)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00117}00117     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00118}00118     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(z)):       }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00119}00119         }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00120}00120         \textcolor{comment}{\# calculate integral 1}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00121}00121         int1\_1[i] = np.dot( ACT\_per[3:6,i], Y[3:6,i] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00122}00122         int1\_2[i] = -\/ACT\_per[12,i]*Y[9,i]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00123}00123         int1\_3[i] = -\/np.dot( ACT\_per[9:12,i], Y[0:3,i] ) }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00124}00124         int1\_4[i] = -\/np.dot( ACT\_per[0:3,i], Y[6:9,i] )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00125}00125         }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00126}00126         \textcolor{comment}{\# calculate integral 2}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00127}00127         int2\_1[i] = np.dot( Y\_adj[3:6,i], np.matmul( O\_per[i],Y[0:3,i] ) )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00128}00128         int2\_2[i] = np.dot( Y[0:3,i], N\_per[i] )*Y\_adj[9,i]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00129}00129         int2\_3[i] = -\/np.dot( Y\_adj[0:3,i], np.matmul( O\_per[i],Y[3:6,i] ) )}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00130}00130         int2\_4[i] = -\/np.dot( Y\_adj[0:3,i], N\_per[i] )*Y[9,i]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00131}00131     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00132}00132     \textcolor{comment}{\#int\_val = np.trapz(int1\_1+int1\_2+int1\_3+int1\_4,z) + np.trapz(int2\_1+int2\_2+int2\_3+int2\_4,z)}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00133}00133     int\_val = np.trapz(int2\_1+int2\_2+int2\_3+int2\_4,z)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00134}00134     \textcolor{keywordflow}{return} int\_val      }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00135}00135     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00136}00136 \textcolor{keyword}{def }gd\_FOM(a,X):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00137}00137     \textcolor{comment}{\# grab parameters}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00138}00138     init\_cond = X}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00139}00139     lattice,\_ = getLattice(a)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00140}00140     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00141}00141     \textcolor{comment}{\# run moment equations}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00142}00142     z,y,motion,k = run\_moments(init\_cond, lattice, h, physics\_params, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00143}00143     \textcolor{keywordflow}{return} get\_FOM(y)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00144}00144     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00145}00145 \textcolor{keyword}{def }gd\_dFOM(a,X,z,y,y\_adj,O\_nope,N\_nope,ACT\_nope):    }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00146}00146     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00147}00147     dFOM\_X = get\_dFOM\_X(y\_adj)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00148}00148     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00149}00149     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00151}00151     dFOM\_a = np.zeros(len(a))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00152}00152     a\_copy =  a.copy()}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00153}00153     perturb = 0.001}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00154}00154     \textcolor{keyword}{import} time}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00155}00155     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(a\_copy)):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00156}00156         \textcolor{comment}{\# perturb}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00157}00157         a[i] = a\_copy[i] + a\_copy[i]*perturb}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00158}00158         \textcolor{comment}{\# grab updated lattice}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00159}00159         lattice,\_ = getLattice(a)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00160}00160         k = getLatticeKvsZ(lattice,h)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00161}00161         \textcolor{comment}{\# calculate O,N perturbed matrices }}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00162}00162         O,N,ACT = get\_ON\_and\_ACT(z,y,y\_adj,k,physics\_params)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00163}00163         \textcolor{keywordflow}{for} j \textcolor{keywordflow}{in} range(len(z)):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00164}00164             O[j] = O[j] -\/ O\_nope[j]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00165}00165             N[j] = N[j] -\/ N\_nope[j]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00166}00166             }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00167}00167         \textcolor{comment}{\# calculate integral}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00168}00168         dFOM\_a[i] = get\_dFOM\_a(z,y,y\_adj,O,N,ACT)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00169}00169         }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00170}00170     \textcolor{keywordflow}{return} dFOM\_a,dFOM\_X        }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00171}00171 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00172}00172 \textcolor{keyword}{def }gd\_adj(a,X):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00173}00173     \textcolor{comment}{\# grab parameters}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00174}00174     init\_cond = X}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00175}00175     lattice,lattice\_r = getLattice(a)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00176}00176     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00177}00177     \textcolor{comment}{\# run moment equations to get values at z=z\_final}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00178}00178     z,y\_m,motion,\_ = run\_moments(init\_cond, lattice, h, physics\_params, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00179}00179     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00180}00180     \textcolor{comment}{\# setup adjoint initial conditions @ z=z\_final}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00181}00181     dF = get\_dFOM(y\_m)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00182}00182     init\_cond\_adj = np.array([ -\/dF[6],-\/dF[7],-\/dF[8],dF[3],dF[4],dF[5],-\/dF[0],-\/dF[1],-\/dF[2],-\/dF[9],0 ])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00183}00183     init\_cond\_adj = np.concatenate(( init\_cond\_adj,np.reshape(y\_m[:,-\/1].T,(11)) ))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00184}00184     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00185}00185     \textcolor{comment}{\# Run adjoint equations backwards starting from z=z\_final to z=0}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00186}00186     z,y\_mom,y\_adj,motion,k = run\_moments\_adjoint(init\_cond\_adj, lattice\_r, -\/h, physics\_params, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00187}00187     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00188}00188     \textcolor{keywordflow}{return} z,y\_mom,y\_adj,motion,k}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00189}00189 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00190}00190 \textcolor{keyword}{def }PrintFoM(FoM):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00191}00191     print(\textcolor{stringliteral}{'FoM: '}+str(FoM))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00192}00192 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00193}00193 \textcolor{keyword}{def }RunMoments(lattice,init\_cond):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00194}00194     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00195}00195     \textcolor{comment}{\# run moment equations}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00196}00196     z,y,motion,k = run\_moments(init\_cond, lattice, h, physics\_params, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__1var__functions_8py_source_l00197}00197     \textcolor{keywordflow}{return} z,y,motion,k}
+
+\end{DoxyCode}

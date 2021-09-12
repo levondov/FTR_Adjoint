@@ -1,0 +1,183 @@
+\hypertarget{moment__equations__util_8py_source}{}\doxysection{moment\+\_\+equations\+\_\+util.\+py}
+\label{moment__equations__util_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/moment\_equations\_util.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/moment\_equations\_util.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00001}00001 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00002}00002 \textcolor{keyword}{import} scipy \textcolor{keyword}{as} sp}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00003}00003 \textcolor{keyword}{import} matplotlib.pyplot \textcolor{keyword}{as} plt}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00004}00004 \textcolor{keyword}{from} tabulate \textcolor{keyword}{import} tabulate}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00005}00005     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00006}00006     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00007}00007 \textcolor{keyword}{def }Get\_beamridg\_and\_perv(energy=5e3,current=0.0):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00008}00008     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00009}00009 \textcolor{stringliteral}{    Grab beam ridgidity}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00010}00010 \textcolor{stringliteral}{    '''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00011}00011 \textcolor{stringliteral}{    }\textcolor{comment}{\# Parameters}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00012}00012     e         = 1.60217733E-\/19 \textcolor{comment}{\#C}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00013}00013     m         = 9.1093897E-\/31 \textcolor{comment}{\#kg}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00014}00014     Energy    = energy \textcolor{comment}{\# eV}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00015}00015     c         = 2.997924E8 \textcolor{comment}{\# m/s}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00016}00016 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00017}00017     gamma     = 1+((Energy)/(510998.9461));}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00018}00018     beta      = np.sqrt((gamma*gamma)-\/1)/gamma}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00019}00019     v         = beta*c}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00020}00020     bg        = beta*gamma}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00021}00021     rho       = bg*c*(m/e) }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00022}00022     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00023}00023     k\_perv = (1.0/(4.0*np.pi))*(c*377.0*current) / (m*v**3*gamma**3/e);   }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00024}00024     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00025}00025     \textcolor{keywordflow}{return} rho,k\_perv}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00026}00026 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00027}00027 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00028}00028 \textcolor{keyword}{def }ode3(F,h,y0,lattice,ACT=None,verbose\_f=False):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00029}00029     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00030}00030 \textcolor{stringliteral}{    3rd order modified classical Runge-\/Kutta ODE solver}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00031}00031 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00032}00032 \textcolor{stringliteral}{    This functions goes through each element }\textcolor{keywordflow}{and} integrates the moment equations through a given quadrupole field profile}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00033}00033     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00034}00034 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00035}00035 \textcolor{stringliteral}{    yout = np.array([]).reshape(len(y0),0)}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00036}00036 \textcolor{stringliteral}{    tout = np.array([])}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00037}00037 \textcolor{stringliteral}{    kval = np.array([])}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00038}00038 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00039}00039 \textcolor{stringliteral}{    }\textcolor{comment}{\# integrate through each element one at a time, making sure to match the initial conditions at the boundary points of elements}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00040}00040     \textcolor{keywordflow}{for} j,elem \textcolor{keywordflow}{in} enumerate(lattice):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00041}00041     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00042}00042         \textcolor{keywordflow}{if} verbose\_f:}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00043}00043             print(\textcolor{stringliteral}{"{}Integrating element: "{}}+str(j+1))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00044}00044             }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00045}00045         \textcolor{comment}{\# start, stop, and k value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00046}00046         t0 = elem[0]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00047}00047         t1 = elem[1]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00048}00048         k = elem[2]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00049}00049         tsteps = np.arange(t0,t1,h)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00050}00050         tout = np.concatenate((tout,tsteps))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00051}00051         kval = np.concatenate((kval,[k]*len(tsteps)))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00052}00052         }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00053}00053         \textcolor{comment}{\# initialize output values for this element}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00054}00054         ytmp = np.zeros((len(y0),len(tsteps)+1)) \textcolor{comment}{\# +1 for initial value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00055}00055         \textcolor{comment}{\# initial conditions are the very last set of points integrated in the previous element (except for the starting element)}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00056}00056         ytmp[:,0] = yout[:,-\/1] \textcolor{keywordflow}{if} (j > 0) \textcolor{keywordflow}{else} y0}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00057}00057         }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00058}00058         \textcolor{comment}{\# run rk3 ode solver algorithm through the element}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00059}00059         y = ytmp[:,0]        }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00060}00060         \textcolor{keywordflow}{for} i,t \textcolor{keywordflow}{in} enumerate(tsteps):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00061}00061             t1 = F(t,y,elem[2])}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00062}00062             s1 = h*t1}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00063}00063             t2 = F(t+h/2.0, y+s1/2.0, elem[2])}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00064}00064             s2 = h*t2}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00065}00065             t3 = F(t+h, y-\/s1+2.0*s2, elem[2])}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00066}00066             s3 = h*t3}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00067}00067             y = y + (s1 + 4.0*s2 + s3)/6.0}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00068}00068             ytmp[:,i+1] = y}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00069}00069         }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00070}00070         \textcolor{comment}{\# append to main output before moving onto next element        }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00071}00071         yout = np.concatenate((yout,ytmp),1) \textcolor{keywordflow}{if} (j==0) \textcolor{keywordflow}{else} np.concatenate((yout,ytmp[:,1:]),1)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00072}00072 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00073}00073     tout = np.concatenate((tout,np.array([tout[-\/1]+h])))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00074}00074     kval = np.concatenate((kval,np.array([k])))  }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00075}00075     \textcolor{keywordflow}{return} tout,yout,kval}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00076}00076     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00077}00077 \textcolor{keyword}{def }getLatticeKvsZ(lattice,h):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00078}00078     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00079}00079 \textcolor{stringliteral}{    returns K }\textcolor{keyword}{as} a function of z}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00080}00080     \textcolor{stringliteral}{'''   }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00081}00081 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00082}00082 \textcolor{stringliteral}{    kval = np.array([])}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00083}00083 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00084}00084 \textcolor{stringliteral}{    }\textcolor{keywordflow}{for} j,elem \textcolor{keywordflow}{in} enumerate(lattice):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00085}00085         \textcolor{comment}{\# start, stop, and k value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00086}00086         t0 = elem[0]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00087}00087         t1 = elem[1]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00088}00088         k = elem[2]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00089}00089         tsteps = np.arange(t0,t1,h)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00090}00090         kval = np.concatenate((kval,[k]*len(tsteps)))   }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00091}00091     kval = np.concatenate((kval,np.array([k])))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00092}00092     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00093}00093     \textcolor{keywordflow}{return} kval          }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00094}00094     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00095}00095 \textcolor{keyword}{def }CreateLatticeProfile(amplitude=1.0,qlength=0.1,dlength=0.1,polarity=[1,-\/1],repeat=1,verbose=False):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00096}00096     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00097}00097 \textcolor{stringliteral}{    amplitude -\/ quadrupole strength amplitude}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00098}00098 \textcolor{stringliteral}{    qlength -\/ quadrupole length}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00099}00099 \textcolor{stringliteral}{    dlength -\/ drift length inbetween quads}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00100}00100 \textcolor{stringliteral}{    repeat -\/ number of times to repeat}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00101}00101 \textcolor{stringliteral}{    polarity -\/ quad polarity }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00102}00102 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00103}00103 \textcolor{stringliteral}{    the length of qlength, dlength, amplitude, polarity should be equal}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00104}00104 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00105}00105 \textcolor{stringliteral}{    The arrays should follow the lattice pattern: drift length, quad length, drift length, quad length, etc...}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00106}00106 \textcolor{stringliteral}{    note that either drift length }\textcolor{keywordflow}{or} quad length can be zero. This way you can make patterns like drift-\/quad-\/quad-\/drift etc.}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00107}00107     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00108}00108 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00109}00109 \textcolor{stringliteral}{    }\textcolor{comment}{\# how many quads}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00110}00110     amplitude = np.tile(amplitude,repeat)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00111}00111     qlength = np.tile(qlength,repeat)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00112}00112     dlength = np.tile(dlength,repeat)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00113}00113     polarity = np.tile(polarity,repeat)        }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00114}00114     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00115}00115     \textcolor{comment}{\# organize elements into three arrays, element start position, end position, and k value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00116}00116     \textcolor{comment}{\# organize into two arrays for the quad starting and ending positions}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00117}00117     elemLocations = np.zeros(len(qlength) + len(dlength))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00118}00118              }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00119}00119     ii = 0}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00120}00120     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(qlength)):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00121}00121         elemLocations[ii] = dlength[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00122}00122         ii+=1}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00123}00123         elemLocations[ii] = qlength[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00124}00124         ii+=1}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00125}00125     elemLocations = np.cumsum(elemLocations) \textcolor{comment}{\# this list should always be even length, since we need a dlength for every qlength}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00126}00126     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00127}00127     qStartLocations = elemLocations[0::2]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00128}00128     qEndLocations = elemLocations[1::2]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00129}00129     dStartLocations = np.concatenate(([0],elemLocations[1::2][0:-\/1]))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00130}00130     dEndLocations = elemLocations[0::2]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00131}00131     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00132}00132     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00133}00133     \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00134}00134         print(\textcolor{stringliteral}{"{}\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00135}00135         print(amplitude)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00136}00136         print(qlength)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00137}00137         print(dlength)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00138}00138         print(polarity)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00139}00139         print(qStartLocations)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00140}00140         print(qEndLocations)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00141}00141         print(dStartLocations)}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00142}00142         print(dEndLocations)        }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00143}00143         print(\textcolor{stringliteral}{"{}\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00144}00144     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00145}00145     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00146}00146     elemLatticeInfo = np.zeros((len(elemLocations),3))}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00147}00147     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00148}00148     \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00149}00149     \textcolor{comment}{\# element \# | start location | end location | k value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00150}00150     ii=0}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00151}00151     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(qStartLocations)):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00152}00152         elemLatticeInfo[ii,0] = dStartLocations[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00153}00153         elemLatticeInfo[ii,1] = dEndLocations[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00154}00154         elemLatticeInfo[ii,2] = 0.0 \textcolor{comment}{\# drift has no k value}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00155}00155         ii+=1}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00156}00156         elemLatticeInfo[ii,0] = qStartLocations[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00157}00157         elemLatticeInfo[ii,1] = qEndLocations[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00158}00158         elemLatticeInfo[ii,2] = amplitude[i]*polarity[i]}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00159}00159         ii+=1                  }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00160}00160        }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00161}00161     \textcolor{keywordflow}{return} elemLatticeInfo}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00162}00162     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00163}00163 \textcolor{keyword}{def }PlotLatticeProfile(lattice):                     }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00164}00164     N,\_ = lattice.shape}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00165}00165     \textcolor{keywordflow}{for} ii,elem \textcolor{keywordflow}{in} enumerate(lattice):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00166}00166         \textcolor{keywordflow}{if} (elem[0] != elem[1]):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00167}00167             plt.plot([elem[0],elem[1]],[elem[2],elem[2]],color=\textcolor{stringliteral}{'k'})}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00168}00168             \textcolor{comment}{\# connect previous element to current element}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00169}00169             \textcolor{keywordflow}{if} (ii > 0 \textcolor{keywordflow}{and} ii < N): \textcolor{comment}{\# no connecting first or last element}}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00170}00170                 \textcolor{keywordflow}{if} (lattice[ii-\/1,0] != lattice[ii-\/1,1]):}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00171}00171                     plt.plot([lattice[ii-\/1,1],lattice[ii,0]],[lattice[ii-\/1,2],lattice[ii,2]],color=\textcolor{stringliteral}{'k'})}
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00172}00172 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00173}00173 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00174}00174 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00175}00175 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00176}00176 }
+\DoxyCodeLine{\Hypertarget{moment__equations__util_8py_source_l00177}00177     }
+
+\end{DoxyCode}

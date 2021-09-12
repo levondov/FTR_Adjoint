@@ -1,0 +1,61 @@
+
+Things to investigate
+
+Editor comments
+
+fig1 - remove unncessary square border to figure if possible
+all figs - remove grid on lines
+all figs - change matplotlib 1e-x to 10^x
+fig5 - change Log to log and make it log_{10}
+
+Reviewer A
+
+Easy fixes:
+all figs - change 1e-x to 10^x
+change all Fig x to Fig. x
+change all Eq (x) to Eq. x?
+
+
+other fixes:
+- discuss constant of motion in Eq. 21
+    - reference [24] for this constant of motion not clear. Discuss CoM further.
+    
+- more analysis on nonlinear edge fields (in solenoid + quads) what effect does it have on
+optimization
+
+- synchrotron radiation effects? Does adjoint method work?
+
+
+Reviewer B
+
+Easy fixes:
+
+other fixes:
+
+- why represent in larmor frame. GUI program already exists to optimize linear space charge.
+
+- the FTR transformer conditions for electron cooling are independent of space-charge.
+
+
+
+- investigate FoM to optimize between radial oscillations and angular momentum.
+- investigate equations
+- eq (39) should be Q+
+
+
+
+
+
+
+
+
+
+
+
+
+########### Code . What to change for new FoM
+gd_F.m
+gd_cadj.m
+
+
+

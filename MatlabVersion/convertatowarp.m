@@ -33,7 +33,7 @@ else % for cos^2 profile
     prof_offset = -0.00045;
 end
 
-params = [0.313,0.863,15e-4,... % solenoid start, length, strength
+params = [0.213,0.863,-15e-4,... % solenoid start, length, strength
     .00425+prof_offset,.0001*ql,-18.236*qs(1),... % quad 1 start, length, strength
     0.10655+prof_offset,0.0001*ql,21.3640*qs(2),... % quad 2 start, length, strength
     0.20895+prof_offset,0.0001*ql,-18.236*qs(3),... % quad 3 start, length, strength

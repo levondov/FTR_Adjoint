@@ -1,0 +1,348 @@
+\hypertarget{moment__equations_8py_source}{}\doxysection{moment\+\_\+equations.\+py}
+\label{moment__equations_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/moment\_equations.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/moment\_equations.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00001}00001 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00002}00002 \textcolor{keyword}{import} scipy \textcolor{keyword}{as} sp}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00003}00003 \textcolor{keyword}{from} moment\_equations\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00004}00004 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00005}00005 \textcolor{comment}{\# Python version of Tom's Moment equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00006}00006 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00007}00007 \textcolor{keyword}{def }run\_moments(init\_conditions, lattice, h, physics\_params,verbose=False):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00008}00008     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00009}00009 \textcolor{stringliteral}{        INPUTS:}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00010}00010 \textcolor{stringliteral}{            init\_conditions -\/ initial conditions }\textcolor{keywordflow}{for} the integration}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00011}00011             lattice -\/ magnet profile (\textcolor{keyword}{from} CreateLatticeProfile()}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00012}00012             h -\/ integration step size}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00013}00013             z\_interval -\/ integration interval}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00014}00014             physics\_params -\/ list of physics params}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00015}00015             }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00016}00016         OUTPUTS:}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00017}00017             z -\/ z position of solved ode (independent variable)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00018}00018             y -\/ variables solved \textcolor{keywordflow}{in} ode}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00019}00019             motion -\/ constant of motion \textcolor{keywordflow}{in} the system}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00020}00020     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00021}00021 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00022}00022 \textcolor{stringliteral}{    }\textcolor{comment}{\# grab some more physics params}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00023}00023     physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}], physics\_params[\textcolor{stringliteral}{"{}perveance"{}}] = Get\_beamridg\_and\_perv(physics\_params[\textcolor{stringliteral}{"{}energy"{}}],physics\_params[\textcolor{stringliteral}{"{}current"{}}])  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00024}00024     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00025}00025     odefunc = \textcolor{keyword}{lambda} z,Y,dbdx : ode\_moments(z,Y,dbdx,physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00026}00026     z,y,k = ode3(odefunc, h, init\_conditions, lattice, verbose\_f=verbose)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00027}00027 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00028}00028     \textcolor{comment}{\# Constant of Motion \%}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00029}00029     motion = get\_COM(y)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00030}00030     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00031}00031     \textcolor{keywordflow}{return} z,y,motion,k}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00032}00032     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00033}00033 \textcolor{keyword}{def }run\_moments\_adjoint(init\_conditions, lattice, h, physics\_params,verbose=False):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00034}00034     \textcolor{comment}{\# grab some more physics params}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00035}00035     physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}], physics\_params[\textcolor{stringliteral}{"{}perveance"{}}] = Get\_beamridg\_and\_perv(physics\_params[\textcolor{stringliteral}{"{}energy"{}}],physics\_params[\textcolor{stringliteral}{"{}current"{}}])  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00036}00036     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00037}00037     odefunc = \textcolor{keyword}{lambda} z,Y,dbdx : ode\_moments\_adjoint(z,Y,dbdx,physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00038}00038     z,y,k = ode3(odefunc, h, init\_conditions, lattice, verbose\_f=verbose)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00039}00039     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00040}00040     y\_mom = np.flip(y[11:,:],1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00041}00041     y\_adj = np.flip(y[0:11,:],1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00042}00042     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00043}00043     \textcolor{comment}{\# Constant of Motion \%}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00044}00044     motion = get\_COM(y\_mom)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00045}00045     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00046}00046     \textcolor{keywordflow}{return} np.flip(z),y\_mom,y\_adj,motion, np.flip(k)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00047}00047     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00048}00048 \textcolor{keyword}{def }calcON(Y, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4, physics\_params): }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00049}00049     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00050}00050 \textcolor{stringliteral}{    Helper function that calculates the O }\textcolor{keywordflow}{and} N matrix}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00051}00051     \textcolor{stringliteral}{''' }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00052}00052 \textcolor{stringliteral}{    }\textcolor{comment}{\# pipe radius calculation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00053}00053     pipe\_constant = (8*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}]/physics\_params[\textcolor{stringliteral}{"{}pipe\_radius"{}}]**4) \textcolor{keywordflow}{if} physics\_params[\textcolor{stringliteral}{"{}pipe\_radius"{}}] != 0 \textcolor{keywordflow}{else} 0 \textcolor{comment}{\# zero pipe radius leads to infinity}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00054}00054     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00055}00055     \textcolor{comment}{\# O and N matrix calculations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00056}00056     O\_mat = np.array([[-\/k\_sol**2/2.0 + ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}], 2.0*k\_quad*cq + ca\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}], -\/2.0*k\_quad*sq + sa\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}]],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00057}00057         [2.0*k\_quad*cq + ca\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}], -\/k\_sol**2/2.0 + ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}], 0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00058}00058         [-\/2.0*k\_quad*sq + sa\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}], 0, -\/k\_sol**2/2.0 + ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}]]]) + pipe\_constant*np.array([ [0, -\/Y[1], -\/Y[2]],[-\/Y[1], 0, 0],[-\/Y[2], 0, 0] ])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00059}00059 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00060}00060     N\_mat = np.array([[0], [2.0*k\_quad*sq -\/ sa\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}]], [2.0*k\_quad*cq + ca\_ab4*physics\_params[\textcolor{stringliteral}{"{}perveance"{}}]]])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00061}00061     -\/ pipe\_constant*np.array([[0], [-\/Y[2]], [Y[1]]]) \textcolor{comment}{\# pipe radius image forces addition  }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00062}00062     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00063}00063     \textcolor{keywordflow}{return} O\_mat,N\_mat}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00064}00064     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00065}00065 \textcolor{keyword}{def }ode\_moments(z,Y,quad\_dbdx,physics\_params):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00066}00066     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00067}00067 \textcolor{stringliteral}{    Main function that solves Tom's moment equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00068}00068 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00069}00069 \textcolor{stringliteral}{    Y(1) -\/ Q+}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00070}00070 \textcolor{stringliteral}{    Y(2) -\/ Q-\/}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00071}00071 \textcolor{stringliteral}{    Y(3) -\/ Qx}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00072}00072 \textcolor{stringliteral}{    Y(4) -\/ P+}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00073}00073 \textcolor{stringliteral}{    Y(5) -\/ P-\/}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00074}00074 \textcolor{stringliteral}{    Y(6) -\/ Px}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00075}00075 \textcolor{stringliteral}{    Y(7) -\/ E+}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00076}00076 \textcolor{stringliteral}{    Y(8) -\/ E-\/}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00077}00077 \textcolor{stringliteral}{    Y(9) -\/ Ex}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00078}00078 \textcolor{stringliteral}{    Y(10) -\/ L}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00079}00079 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00080}00080 \textcolor{stringliteral}{    physics\_params should have values }\textcolor{keywordflow}{for}: rigidity, perveance, pipe\_radius}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00081}00081     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00082}00082 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00083}00083 \textcolor{stringliteral}{    }\textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00084}00084     psi = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00085}00085     k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00086}00086     k\_quad = quad\_dbdx / physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}]}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00087}00087             }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00088}00088     \textcolor{comment}{\# cq, sq quad calculations         }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00089}00089     cq = np.cos(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00090}00090     sq = np.sin(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00091}00091     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00092}00092     \textcolor{comment}{\# space charge calculation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00093}00093     Q\_delta = np.sqrt( Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 ) \textcolor{keywordflow}{if} Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 >= 0 \textcolor{keywordflow}{else} 2**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00094}00094     ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00095}00095     ca\_ab4 = -\/Y[1] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00096}00096     sa\_ab4 = -\/Y[2] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00097}00097     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00098}00098     \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00099}00099     O\_mat,N\_mat = calcON(Y, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4, physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00100}00100     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00101}00101     \textcolor{comment}{\# System of 10 equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00102}00102     dydt = np.array([}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00103}00103     \textcolor{comment}{\# dQ/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00104}00104     Y[3],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00105}00105     Y[4],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00106}00106     Y[5],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00107}00107     \textcolor{comment}{\# dP/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00108}00108     Y[6] + np.matmul( O\_mat[0,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00109}00109     Y[7] + np.matmul( O\_mat[1,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00110}00110     Y[8] + np.matmul( O\_mat[2,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00111}00111     \textcolor{comment}{\# dE/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00112}00112     np.matmul( O\_mat[0,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[0,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00113}00113     np.matmul( O\_mat[1,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[1,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00114}00114     np.matmul( O\_mat[2,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[2,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00115}00115     \textcolor{comment}{\# dL/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00116}00116     -\/1.0*np.matmul( N\_mat.T, Y[0:3] )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00117}00117     \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00118}00118     -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00119}00119     ])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00120}00120     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00121}00121     \textcolor{keywordflow}{return} dydt}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00122}00122     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00123}00123 \textcolor{keyword}{def }ode\_moments\_adjoint(z,Yt,quad\_dbdx,physics\_params):  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00124}00124     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00125}00125 \textcolor{stringliteral}{    Main function to solve the adjoint equations (backwards)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00126}00126 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00127}00127 \textcolor{stringliteral}{    Here we have the original 11 moments + the 11 adjoint moments }\textcolor{keywordflow}{for} a total of a 22 variable ode solve}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00128}00128     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00129}00129 \textcolor{stringliteral}{    Y = Yt[0:11] }\textcolor{comment}{\# adjoint variables}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00130}00130     Y2 = Yt[11:] \textcolor{comment}{\# moment variables}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00131}00131     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00132}00132     \textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00133}00133     psi = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00134}00134     k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00135}00135     k\_quad = quad\_dbdx / physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}]  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00136}00136             }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00137}00137     \textcolor{comment}{\# calculations            }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00138}00138     cq = np.cos(2.0*Y2[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00139}00139     sq = np.sin(2.0*Y2[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00140}00140     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00141}00141     \textcolor{comment}{\# space charge stuff}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00142}00142     Q\_delta = np.sqrt( Y2[0]**2 -\/ Y2[1]**2 -\/ Y2[2]**2 ) \textcolor{keywordflow}{if} Y2[0]**2 -\/ Y2[1]**2 -\/ Y2[2]**2 >= 0 \textcolor{keywordflow}{else} 2**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00143}00143     ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00144}00144     ca\_ab4 = -\/Y2[1] / ( (Y2[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00145}00145     sa\_ab4 = -\/Y2[2] / ( (Y2[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00146}00146     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00147}00147     \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00148}00148     O\_mat,N\_mat = calcON(Y2, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4, physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00149}00149     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00150}00150     \textcolor{comment}{\# Calculate special matrix due to space charge variations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00151}00151     [Mq,Mp,Mn] = get\_SCVM(Y2,physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00152}00152     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00153}00153     \textcolor{comment}{\# System of 20 equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00154}00154     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00155}00155     \textcolor{comment}{\# Solve regular envelope equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00156}00156     dydt = np.array([}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00157}00157     \textcolor{comment}{\# dQ/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00158}00158     Y2[3],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00159}00159     Y2[4],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00160}00160     Y2[5],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00161}00161     \textcolor{comment}{\# dP/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00162}00162     Y2[6] + np.matmul( O\_mat[0,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00163}00163     Y2[7] + np.matmul( O\_mat[1,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00164}00164     Y2[8] + np.matmul( O\_mat[2,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00165}00165     \textcolor{comment}{\# dE/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00166}00166     np.matmul( O\_mat[0,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[0,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00167}00167     np.matmul( O\_mat[1,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[1,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00168}00168     np.matmul( O\_mat[2,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[2,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00169}00169     \textcolor{comment}{\# dL/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00170}00170     -\/1.0*np.matmul( N\_mat.T, Y2[0:3] )[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00171}00171     \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00172}00172     -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00173}00173     ])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00174}00174     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00175}00175     \textcolor{comment}{\# dE dot 1 (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00176}00176     dedot1 = np.matmul( np.reshape(Y[3:6], (1,3)), Mq )[0] + \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00177}00177         Y[9]*np.matmul( np.reshape(Y2[0:3], (1,3)), Mn )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00178}00178         np.matmul( np.reshape(Y[0:3], (1,3)), Mp )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00179}00179         Y2[9]*np.matmul( np.reshape(Y[0:3], (1,3)), Mn )[0] }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00180}00180     \textcolor{comment}{\# dE dot 2 (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00181}00181     dedot2 = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00182}00182     \textcolor{comment}{\# dE dot total (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00183}00183     dedot = dedot1 + dedot2}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00184}00184     \textcolor{comment}{\# dQ dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00185}00185     dqdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00186}00186     \textcolor{keywordflow}{if} z == 0.0:}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00187}00187         dqdot = np.array([2*Y2[0],0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00188}00188     \textcolor{comment}{\# dP dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00189}00189     dpdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00190}00190     \textcolor{comment}{\# dL dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00191}00191     dldot = 0 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00192}00192     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00193}00193     \textcolor{comment}{\# Solve adjoint equations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00194}00194     dydt2 = np.array([}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00195}00195     \textcolor{comment}{\#dQ/dz (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00196}00196     Y[3] + dqdot[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00197}00197     Y[4] + dqdot[1],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00198}00198     Y[5] + dqdot[2],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00199}00199     \textcolor{comment}{\# dP/dz (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00200}00200     Y[6] + np.matmul( O\_mat[0,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00201}00201     Y[7] + np.matmul( O\_mat[1,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[1],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00202}00202     Y[8] + np.matmul( O\_mat[2,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[2],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00203}00203     \textcolor{comment}{\# dE/dz (y) }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00204}00204     np.matmul( O\_mat[0,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[0,0]*Y[9] + dedot[0],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00205}00205     np.matmul( O\_mat[1,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[1,0]*Y[9] + dedot[1],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00206}00206     np.matmul( O\_mat[2,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[2,0]*Y[9] + dedot[2],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00207}00207     \textcolor{comment}{\# dL/dz    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00208}00208     -\/1.0*np.matmul( N\_mat.T, Y[0:3] )[0] + dldot,   }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00209}00209     \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00210}00210     -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00211}00211     ])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00212}00212     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00213}00213     \textcolor{keywordflow}{return} np.concatenate((dydt2,dydt))}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00214}00214     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00215}00215 \textcolor{keyword}{def }get\_COM(y):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00216}00216     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00217}00217 \textcolor{stringliteral}{    Calculate the constant of motion}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00218}00218 \textcolor{stringliteral}{    '''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00219}00219 \textcolor{stringliteral}{    L = y[9,:]}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00220}00220 \textcolor{stringliteral}{    EQ = y[6,:]*y[0,:] + y[7,:]*y[1,:] + y[8,:]*y[2,:]}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00221}00221 \textcolor{stringliteral}{    PP = y[3,:]**2 + y[4,:]**2 + y[5,:]**2}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00222}00222 \textcolor{stringliteral}{    motion = EQ + (0.5)*L**2 -\/ (0.5)*PP}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00223}00223 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00224}00224 \textcolor{stringliteral}{    }\textcolor{keywordflow}{return} motion}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00225}00225     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00226}00226     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00227}00227 \textcolor{keyword}{def }get\_SCVM(Y,physics\_params):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00228}00228     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00229}00229 \textcolor{stringliteral}{    find space charge variation matrices needed }\textcolor{keywordflow}{for} adjoint calculation}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00230}00230     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00231}00231 \textcolor{stringliteral}{    k\_perv = physics\_params["{}perveance"{}}]}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00232}00232     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00233}00233     Q\_delta = np.sqrt( Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 )}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00234}00234     H = k\_perv*np.log(Y[0] + Q\_delta)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00235}00235     Q\_deltaplus = Q\_delta + Y[0]}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00236}00236 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00237}00237     V1 = -\/(k\_perv/(Q\_delta**2))*np.array([Y[3]-\/Y[1]*Y[4]/Q\_deltaplus-\/Y[2]*Y[5]/Q\_deltaplus,}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00238}00238         -\/Y[1]*Y[3]/Q\_deltaplus+Y[4],}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00239}00239         -\/Y[2]*Y[3]/Q\_deltaplus+Y[5]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00240}00240     U1t = (1./Q\_delta)*np.array([Y[0], -\/Y[1], -\/Y[2]]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00241}00241 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00242}00242     V2 = (k\_perv/(Q\_delta*(Q\_deltaplus**2)))*np.array([Y[1]*Y[4]+Y[2]*Y[5],Y[1]*Y[3],Y[2]*Y[3]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00243}00243     U2t = U1t + np.array([1.,0,0]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00244}00244 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00245}00245     V3 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[4], Y[3], 0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00246}00246     V4 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[5], 0, Y[3]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00247}00247     U3t = np.array([0, 1., 0]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00248}00248     U4t = np.array([0,0,1.]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00249}00249 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00250}00250     Mp = V1*U1t + V2*U2t + V3*U3t + V4*U4t}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00251}00251     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00252}00252 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00253}00253     W1 = -\/(k\_perv/Q\_delta)*np.array([1., Y[1]/Q\_deltaplus, Y[2]/Q\_deltaplus]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00254}00254     W2 = (k\_perv/(Q\_delta*(Q\_deltaplus**2)))*np.array([Y[1]**2+Y[2]**2,Y[1]*Y[0],Y[2]*Y[0]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00255}00255     W3 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[1],Y[0],0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00256}00256     W4 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[2],0,Y[0]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00257}00257 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00258}00258     Mq = W1*U1t + W2*U2t + W3*U3t + W4*U4t}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00259}00259     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00260}00260 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00261}00261     X1 = -\/k\_perv*np.array([0, Y[2]/(Q\_deltaplus*(Q\_delta**2)), -\/Y[1]/(Q\_deltaplus*(Q\_delta**2))]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00262}00262     X2 = -\/k\_perv*np.array([0, Y[2]/(Q\_delta*(Q\_deltaplus**2)), -\/Y[1]/(Q\_delta*(Q\_deltaplus**2))]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00263}00263     X3 = k\_perv*np.array([0,0,-\/1./(Q\_delta*Q\_deltaplus)]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00264}00264     X4 = k\_perv*np.array([0,1./(Q\_delta*Q\_deltaplus),0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00265}00265 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00266}00266     Mn = X1*U1t + X2*U2t + X3*U3t + X4*U4t}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00267}00267     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00268}00268     \textcolor{keywordflow}{return} Mq,Mp,Mn}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00269}00269     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00270}00270 \textcolor{keyword}{def }get\_ON\_and\_ACT(z,Y,Y\_adj,k,physics\_params):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00271}00271     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00272}00272 \textcolor{stringliteral}{    Calculate O }\textcolor{keywordflow}{and} N matrices \textcolor{keyword}{as} well \textcolor{keyword}{as} the adjoint changing variables (dQ,dP,dE,dL \textcolor{keyword}{with} dots over them) }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00273}00273     Note dEdot \textcolor{keywordflow}{is} actually dEdot\_1 \textcolor{keywordflow}{and} dEdot\_2, so 6 variables}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00274}00274     \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00275}00275 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00276}00276 \textcolor{stringliteral}{    }\textcolor{comment}{\# grab some more physics params}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00277}00277     physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}], physics\_params[\textcolor{stringliteral}{"{}perveance"{}}] = Get\_beamridg\_and\_perv(physics\_params[\textcolor{stringliteral}{"{}energy"{}}],physics\_params[\textcolor{stringliteral}{"{}current"{}}])  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00278}00278     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00279}00279     O = np.empty(len(z),dtype=object)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00280}00280     N = np.empty(len(z),dtype=object)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00281}00281     ACT = np.zeros((13,len(z)))}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00282}00282         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00283}00283     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(z)):}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00284}00284         \textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00285}00285         psi = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00286}00286         k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00287}00287         k\_quad = k[i] / physics\_params[\textcolor{stringliteral}{"{}rigidity"{}}]}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00288}00288                 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00289}00289         \textcolor{comment}{\# cq, sq quad calculations         }}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00290}00290         cq = np.cos(2.0*Y[10,i]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00291}00291         sq = np.sin(2.0*Y[10,i]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00292}00292         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00293}00293         \textcolor{comment}{\# space charge calculation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00294}00294         Q\_delta = np.sqrt( Y[0,i]**2 -\/ Y[1,i]**2 -\/ Y[2,i]**2 ) \textcolor{keywordflow}{if} Y[0,i]**2 -\/ Y[1,i]**2 -\/ Y[2,i]**2 >= 0 \textcolor{keywordflow}{else} 2**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00295}00295         ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00296}00296         ca\_ab4 = -\/Y[1,i] / ( (Y[0,i]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00297}00297         sa\_ab4 = -\/Y[2,i] / ( (Y[0,i]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00298}00298         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00299}00299         \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00300}00300         O\_mat,N\_mat = calcON(Y[:,i], k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4, physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00301}00301         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00302}00302         \textcolor{comment}{\# Calculate special matrix due to space charge variations}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00303}00303         [Mq,Mp,Mn] = get\_SCVM(Y[:,i],physics\_params)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00304}00304         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00305}00305         \textcolor{comment}{\# dE dot 1 (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00306}00306         dedot1 = np.matmul( np.reshape(Y\_adj[3:6,i], (1,3)), Mq )[0] + \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00307}00307             Y\_adj[9,i]*np.matmul( np.reshape(Y[0:3,i], (1,3)), Mn )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00308}00308             np.matmul( np.reshape(Y\_adj[0:3,i], (1,3)), Mp )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00309}00309             Y[9,i]*np.matmul( np.reshape(Y\_adj[0:3,i], (1,3)), Mn )[0] }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00310}00310         \textcolor{comment}{\# dE dot 2 (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00311}00311         dedot2 = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00312}00312         \textcolor{comment}{\# dQ dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00313}00313         dqdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00314}00314         \textcolor{comment}{\# dP dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00315}00315         dpdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00316}00316         \textcolor{comment}{\# dL dot (y)}}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00317}00317         dldot = 0 }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00318}00318         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00319}00319         ACT[0:3,i] = dqdot}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00320}00320         ACT[3:6,i] = dpdot}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00321}00321         ACT[6:9,i] = dedot1}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00322}00322         ACT[9:12,i] = dedot2}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00323}00323         ACT[12,i] = dldot}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00324}00324         O[i] = O\_mat}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00325}00325         N[i] = N\_mat  }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00326}00326         }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00327}00327     \textcolor{keywordflow}{return} O,N,ACT}
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00328}00328     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00329}00329     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00330}00330     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00331}00331     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00332}00332     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00333}00333     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00334}00334     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00335}00335     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00336}00336     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00337}00337     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00338}00338     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00339}00339     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00340}00340     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00341}00341     }
+\DoxyCodeLine{\Hypertarget{moment__equations_8py_source_l00342}00342 }
+
+\end{DoxyCode}

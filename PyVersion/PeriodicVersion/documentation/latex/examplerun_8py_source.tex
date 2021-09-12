@@ -1,0 +1,77 @@
+\hypertarget{examplerun_8py_source}{}\doxysection{examplerun.\+py}
+\label{examplerun_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/examplerun.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/examplerun.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00001}00001 \textcolor{keyword}{from} moment\_equations \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00002}00002 \textcolor{keyword}{from} moment\_equations\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00003}00003 \textcolor{keyword}{import} matplotlib.pyplot \textcolor{keyword}{as} plt}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00004}00004 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00005}00005 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00006}00006 repeat = 2 \textcolor{comment}{\# periodicity}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00007}00007 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00008}00008 qstr = 0.02661}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00009}00009 ql = 0.05425}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00010}00010 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00011}00011 amplitude = [qstr]*3 \textcolor{comment}{\# quadrupole amplitude}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00012}00012 qlength = [ql/2.0,ql,ql/2.0] \textcolor{comment}{\# quadrupole length}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00013}00013 dlength = [0.0, 0.025, 0.025] \textcolor{comment}{\# drift space length}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00014}00014 polarity = [1,-\/1,1] \textcolor{comment}{\# quadrupole polarity}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00016}00016 lattice = CreateLatticeProfile(amplitude,qlength,dlength,polarity,repeat,verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00017}00017 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00018}00018 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00019}00019 physics\_params = \{\textcolor{stringliteral}{'energy'}: 10e3, \textcolor{comment}{\#eV}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00020}00020                     \textcolor{stringliteral}{'current'}: 0.0, \textcolor{comment}{\#Amps}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00021}00021                     \textcolor{stringliteral}{'pipe\_radius'}: 0.0 \textcolor{comment}{\#meters}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00022}00022                     \}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00023}00023 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00024}00024 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00025}00025 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00026}00026 init\_cond = Initial\_conditions()     }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00027}00027          }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00028}00028 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00029}00029 \textcolor{comment}{\# run integration}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00030}00030 h = 0.0001 \textcolor{comment}{\# ode step size, make sure h << magnet thicknesses}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00031}00031 z,y,motion = run\_moments(init\_cond, lattice, h, physics\_params, verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00032}00032 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00033}00033 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00034}00034 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00036}00036 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00037}00037 plt.figure()}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00038}00038 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00039}00039 \textcolor{comment}{\# plot moments}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00040}00040 xrms=(y[0,:]+y[1,:])}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00041}00041 yrms=(y[0,:]-\/y[1,:])}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00042}00042 plt.plot(z,xrms,color=\textcolor{stringliteral}{'C0'},label=\textcolor{stringliteral}{'\$\(\backslash\)langle x\string^2 \(\backslash\)\(\backslash\)rangle\$'})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00043}00043 plt.plot(z,yrms,color=\textcolor{stringliteral}{'C1'},label=\textcolor{stringliteral}{'\$\(\backslash\)langle y\string^2 \(\backslash\)\(\backslash\)rangle\$'})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00044}00044 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00045}00045 \textcolor{comment}{\# plot quadrupole profile for reference}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00046}00046 kscale = (np.max(xrms) -\/ np.min(xrms))/np.max(lattice[:,-\/1])*0.25}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00047}00047 koffset = np.max(xrms)*0.75}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00048}00048 lattice\_scaled = np.copy(lattice)}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00049}00049 lattice\_scaled[:,-\/1] = lattice\_scaled[:,-\/1]*kscale+koffset}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00050}00050 plt.plot([],color=\textcolor{stringliteral}{'k'},label=\textcolor{stringliteral}{'\$K\_q\$'})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00051}00051 PlotLatticeProfile(lattice\_scaled)}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00052}00052 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00053}00053 plt.legend()}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00054}00054 plt.grid(\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00055}00055 plt.ylabel(\textcolor{stringliteral}{'moments \$[m\string^2]\$'})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00056}00056 plt.xlabel(\textcolor{stringliteral}{'Z position [m]'})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00057}00057 plt.show()}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00058}00058 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00059}00059 \textcolor{comment}{\# save results}}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00060}00060 \textcolor{keywordflow}{if} 0:}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00061}00061     z=np.reshape(z,(1,len(z)))}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00062}00062     np.savetxt(output\_file,np.r\_[z,y].T[0::10,:],delimiter=\textcolor{stringliteral}{','})}
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00063}00063 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00064}00064 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00065}00065 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00066}00066 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00067}00067 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00068}00068 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00069}00069 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00070}00070 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00071}00071 }
+\DoxyCodeLine{\Hypertarget{examplerun_8py_source_l00072}00072 }
+
+\end{DoxyCode}

@@ -1,0 +1,250 @@
+\hypertarget{gd__adj__match__2var___xa_8py_source}{}\doxysection{gd\+\_\+adj\+\_\+match\+\_\+2var\+\_\+\+Xa.\+py}
+\label{gd__adj__match__2var___xa_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/gd\_adj\_match\_2var\_Xa.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion/gd\_adj\_match\_2var\_Xa.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00001}00001 \textcolor{keyword}{from} analysis\_util \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00002}00002 \textcolor{keyword}{from} gd\_adj\_match\_2var\_functions \textcolor{keyword}{import} *}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00003}00003                }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00004}00004 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00005}00005 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00006}00006 \textcolor{comment}{\# a and X and Y parameters for lattice optimization      }}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00007}00007 lam = 0.1              }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00008}00008 qstr = 0.02661}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00009}00009 ql = 0.05425}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00010}00010 a0 = [0.00638462, 0.00636695, 0.00626687] \textcolor{comment}{\#[qstr,qstr,qstr]}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00011}00011 X0 = Initial\_conditions()}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00012}00012 Y0 = Initial\_conditions()}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00013}00013     }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00014}00014 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00015}00015 z\_p,y\_p,yadj\_p,\_,k\_p = gd\_adj\_p(a0,X0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00016}00016 O0\_p,N0\_p,ACT0\_p = get\_ON\_and\_ACT(z\_p,y\_p,yadj\_p,k\_p,physics\_params)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00017}00017 \textcolor{comment}{\# compute initial values for FoM}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00018}00018 [f0\_p,f00\_p] = gd\_FOMp(a0,X0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00019}00019 \textcolor{comment}{\# compute initial values for FoM derivatives w/ respect to X and a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00020}00020 dfa0\_p,dfX0\_p = gd\_dFOMp(a0,X0,z\_p,y\_p,yadj\_p,O0\_p,N0\_p,ACT0\_p)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00021}00021 \textcolor{comment}{\# scaling term for gd}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00022}00022 gamma\_X0 = (f0\_p/np.sum(dfX0\_p**2))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00023}00023 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00024}00024 z\_e,y\_e,yadj\_e,\_,k\_e = gd\_adj\_e(a0,Y0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00025}00025 O0\_e,N0\_e,ACT0\_e = get\_ON\_and\_ACT(z\_e,y\_e,yadj\_e,k\_e,physics\_params)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00026}00026 \textcolor{comment}{\# compute initial values for FoM}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00027}00027 f0\_e = gd\_FOMe(a0,Y0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00028}00028 \textcolor{comment}{\# compute initial values for FoM derivatives w/ respect to X and a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00029}00029 dfa0\_e,dfY0\_e = gd\_dFOMe(a0,Y0,z\_e,y\_e,yadj\_e,O0\_e,N0\_e,ACT0\_e)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00030}00030 \textcolor{comment}{\# since starting values are the same}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00031}00031 dfY0\_p = dfX0\_p}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00032}00032 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00033}00033 \textcolor{comment}{\# setup variables for holding history of iterations for X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00034}00034 gammaX\_h = np.reshape(gamma\_X0,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00035}00035 X\_h = np.reshape(X0.copy(),(1,len(X0)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00036}00036 fX\_p\_h = np.reshape(f0\_p,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00037}00037 fX\_e\_h = np.reshape(f0\_e,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00038}00038 dfX\_p\_h = np.reshape(dfX0\_p.copy(),(1,len(dfX0\_p)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00039}00039 \textcolor{comment}{\# setup variables for holding history of iterations for Y (initially Y=X)}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00040}00040 gammaY\_h = np.reshape(gamma\_X0,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00041}00041 Y\_h = np.reshape(X0.copy(),(1,len(X0)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00042}00042 fY\_p\_h = np.reshape(f0\_p,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00043}00043 fY\_e\_h = np.reshape(f0\_e,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00044}00044 fY\_h = np.reshape(f0\_p + f0\_e*lam,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00045}00045 dfY\_p\_h = np.reshape(dfY0\_p.copy(),(1,len(dfY0\_p)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00046}00046 dfY\_e\_h = np.reshape(dfY0\_e.copy(),(1,len(dfY0\_e)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00047}00047 \textcolor{comment}{\# setup variablkes for holding history of iterations for a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00048}00048 \textcolor{comment}{\# setup variables for holding history of iterations}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00049}00049 gammaA\_h = np.reshape(gamma\_X0,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00050}00050 a\_h = np.reshape(a0.copy(),(1,len(a0)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00051}00051 dfaX\_p\_h = np.reshape(dfa0\_p.copy(),(1,len(dfa0\_p)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00052}00052 dfaY\_p\_h = np.reshape(dfa0\_p.copy(),(1,len(dfa0\_p)))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00053}00053 fa\_h = np.reshape(0.0,(1,1))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00054}00054 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00055}00055 \textcolor{comment}{\# adjust starting gamma}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00056}00056 \textcolor{comment}{\# iterate X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00057}00057 X\_t = X0 -\/ gamma\_X0*dfX0\_p}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00058}00058 X\_h = np.concatenate((X\_h,np.reshape(X\_t,(1,len(X\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00059}00059 \textcolor{comment}{\# iterate Y}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00060}00060 Y\_t = Y0 -\/ gamma\_X0*(dfY0\_p + lam*dfY0\_e)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00061}00061 Y\_h = np.concatenate((Y\_h,np.reshape(Y\_t,(1,len(Y\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00062}00062 \textcolor{comment}{\# iterate a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00063}00063 a\_t = a0 -\/ (1/lam)*gamma\_X0*(dfaY\_p\_h[-\/1,:] -\/ dfaX\_p\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00064}00064 a\_h = np.concatenate((a\_h,np.reshape(a\_t,(1,len(a\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00065}00065 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00066}00066 \textcolor{comment}{\# compute initial values for FoM, Fp(X) , Fp(Y) , Fe(Y)}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00067}00067 [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00068}00068 fX\_p\_h = np.concatenate((fX\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00069}00069 PrintFoM(f\_t,\textcolor{stringliteral}{'Xp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00070}00070 [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00071}00071 fY\_p\_h = np.concatenate((fY\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00072}00072 PrintFoM(f\_t,\textcolor{stringliteral}{'Yp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00073}00073 f\_t = gd\_FOMe(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00074}00074 fY\_e\_h = np.concatenate((fY\_e\_h,np.array(f\_t).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00075}00075 PrintFoM(f\_t,\textcolor{stringliteral}{'Ye'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00076}00076 fY\_h = np.concatenate((fY\_h,np.array(fY\_p\_h[-\/1,0]+lam*fY\_e\_h[-\/1,0]).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00077}00077 fa\_h = np.concatenate((fa\_h,np.array((1/lam)*(fY\_p\_h[-\/1,0]-\/fX\_p\_h[-\/1,0])).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00078}00078 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00079}00079 \textcolor{comment}{\# iterate to find ideal starting gamma for X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00080}00080 \textcolor{keywordflow}{while} fX\_p\_h[-\/1,0] >= fX\_p\_h[0,0]:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00081}00081     gammaX\_h = np.concatenate((gammaX\_h,np.array(gammaX\_h[-\/1,:]/2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00082}00082 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00083}00083     X\_t = X0 -\/ gammaX\_h[-\/1,0]*dfX0\_p}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00084}00084     X\_h = np.concatenate((X\_h,np.reshape(X\_t,(1,len(X\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00085}00085 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00086}00086     [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00087}00087     fX\_p\_h = np.concatenate((fX\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00088}00088     PrintFoM(f\_t,\textcolor{stringliteral}{'Xp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00089}00089 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00090}00090 \textcolor{comment}{\# iterate to find ideal starting gamma for Y}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00091}00091 \textcolor{comment}{\# use same gamma as X for now}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00092}00092 gammaY\_h = np.concatenate((gammaY\_h,np.array(gammaX\_h[-\/1,:]).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00093}00093 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00094}00094 \textcolor{comment}{\# iterate to find ideal starting gamma for a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00095}00095 \textcolor{keywordflow}{while} fa\_h[-\/1,0] > fa\_h[0,0]:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00096}00096     gammaA\_h = np.concatenate((gammaA\_h,np.array(gammaA\_h[-\/1,:]/2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00097}00097 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00098}00098     a\_t = a0 -\/ (1/lam)*gammaA\_h[-\/1,0]*(dfaY\_p\_h[-\/1,:] -\/ dfaX\_p\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00099}00099     a\_h = np.concatenate((a\_h,np.reshape(a\_t,(1,len(a\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00100}00100 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00101}00101     [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00102}00102     fX\_p\_h = np.concatenate((fX\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)    }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00103}00103 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00104}00104     [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00105}00105     fY\_p\_h = np.concatenate((fY\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)  }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00106}00106 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00107}00107     fa\_h = np.concatenate((fa\_h,np.array((1/lam)*(fY\_p\_h[-\/1,0]-\/fX\_p\_h[-\/1,0])).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00108}00108     PrintFoM(fa\_h[-\/1,0],\textcolor{stringliteral}{'ap'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00109}00109 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00110}00110 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00111}00111 \textcolor{comment}{\# start main optimization loop}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00112}00112 \textcolor{keywordflow}{while} \textcolor{keyword}{True}:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00113}00113     ii=1}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00114}00114     \textcolor{keywordflow}{while} (fX\_p\_h[-\/1,0] < fX\_p\_h[-\/2,0]) \textcolor{keywordflow}{and} (fY\_h[-\/1,0] < fY\_h[-\/2,0]) \textcolor{keywordflow}{and} (fa\_h[-\/1,0] <= fa\_h[-\/2,0]):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00115}00115         print(\textcolor{stringliteral}{'Iterating '}+str(ii))}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00116}00116 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00117}00117         \textcolor{comment}{\# iterate X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00118}00118         X\_t = X\_h[-\/1,:] -\/ gammaX\_h[-\/1,0]*dfX\_p\_h[-\/1,:]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00119}00119         X\_h = np.concatenate((X\_h,np.reshape(X\_t,(1,len(X\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00120}00120         \textcolor{comment}{\# iterate Y}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00121}00121         Y\_t = Y\_h[-\/1,:] -\/ gammaY\_h[-\/1,0]*(dfY\_p\_h[-\/1,:] + lam*dfY\_e\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00122}00122         Y\_h = np.concatenate((Y\_h,np.reshape(Y\_t,(1,len(Y\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00123}00123         \textcolor{comment}{\# iterate a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00124}00124         a\_t = a\_h[-\/1,:] -\/ (1/lam)*gammaA\_h[-\/1,0]*(dfaY\_p\_h[-\/1,:] -\/ dfaX\_p\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00125}00125         a\_h = np.concatenate((a\_h,np.reshape(a\_t,(1,len(a\_t)))),axis=0)        }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00126}00126 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00127}00127         \textcolor{comment}{\# compute FoM, Fp(X) , Fp(Y) , Fe(Y)}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00128}00128         [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00129}00129         fX\_p\_h = np.concatenate((fX\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00130}00130         PrintFoM(f\_t,\textcolor{stringliteral}{'Xp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00131}00131         [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00132}00132         fY\_p\_h = np.concatenate((fY\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00133}00133         PrintFoM(f\_t,\textcolor{stringliteral}{'Yp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00134}00134         f\_t = gd\_FOMe(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00135}00135         fY\_e\_h = np.concatenate((fY\_e\_h,np.array(f\_t).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00136}00136         PrintFoM(f\_t,\textcolor{stringliteral}{'Ye'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00137}00137         fY\_h = np.concatenate((fY\_h,np.array(fY\_p\_h[-\/1,0]+lam*fY\_e\_h[-\/1,0]).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00138}00138         fa\_h = np.concatenate((fa\_h,np.array((1/lam)*(fY\_p\_h[-\/1,0]-\/fX\_p\_h[-\/1,0])).reshape((1,1))), axis=0)        }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00139}00139 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00140}00140         \textcolor{comment}{\# if we have iterated too much, start increasing gamma}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00141}00141         ii += 1}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00142}00142         \textcolor{keywordflow}{if} (ii > 20):}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00143}00143             gammaX\_h = np.concatenate((gammaX\_h,np.array(gammaX\_h[-\/1,:]*2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00144}00144             gammaY\_h = np.concatenate((gammaY\_h,np.array(gammaY\_h[-\/1,:]*2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00145}00145             gammaA\_h = np.concatenate((gammaA\_h,np.array(gammaA\_h[-\/1,:]*2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00146}00146 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00147}00147     \textcolor{comment}{\# recompute adjoint equations for new search direction}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00148}00148     print(\textcolor{stringliteral}{"{}Recomputing adjoint equations"{}})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00149}00149 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00150}00150     \textcolor{comment}{\# grab last good settings}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00151}00151     a\_h = np.concatenate((a\_h,np.reshape(a\_h[-\/2,:],(1,len(a\_h[-\/2,:])))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00152}00152     X\_h = np.concatenate((X\_h,np.reshape(X\_h[-\/2,:],(1,len(X\_h[-\/2,:])))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00153}00153     Y\_h = np.concatenate((Y\_h,np.reshape(Y\_h[-\/2,:],(1,len(Y\_h[-\/2,:])))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00154}00154     fX\_p\_h = np.concatenate((fX\_p\_h,np.array(fX\_p\_h[-\/2,0]).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00155}00155     fY\_h = np.concatenate((fY\_h,np.array(fY\_h[-\/2,0]).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00156}00156     fa\_h = np.concatenate((fa\_h,np.array(fa\_h[-\/2,0]).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00157}00157 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00158}00158     \textcolor{comment}{\# calculate adjoint equations for X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00159}00159     z\_p,y\_p,yadj\_p,\_,k\_p = gd\_adj\_p(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00160}00160     O0\_p,N0\_p,ACT0\_p = get\_ON\_and\_ACT(z\_p,y\_p,yadj\_p,k\_p,physics\_params)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00161}00161     \textcolor{comment}{\# calculate new grdient for X and a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00162}00162     dfaX\_t,dfX\_t = gd\_dFOMp(a\_h[-\/1,:],X\_h[-\/1,:],z\_p,y\_p,yadj\_p,O0\_p,N0\_p,ACT0\_p)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00163}00163     dfX\_p\_h = np.concatenate((dfX\_p\_h,np.reshape(dfX\_t,(1,len(dfX\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00164}00164     dfaX\_p\_h = np.concatenate((dfaX\_p\_h,np.reshape(dfaX\_t,(1,len(dfaX\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00165}00165     \textcolor{comment}{\# calculate adjoint equations for Y}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00166}00166     z\_p,y\_p,yadj\_p,\_,k\_p = gd\_adj\_p(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00167}00167     O0\_p,N0\_p,ACT0\_p = get\_ON\_and\_ACT(z\_p,y\_p,yadj\_p,k\_p,physics\_params)  }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00168}00168     z\_e,y\_e,yadj\_e,\_,k\_e = gd\_adj\_e(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00169}00169     O0\_e,N0\_e,ACT0\_e = get\_ON\_and\_ACT(z\_e,y\_e,yadj\_e,k\_e,physics\_params) }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00170}00170     \textcolor{comment}{\# calculate new gradient for Y and a     }}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00171}00171     dfaY\_t,dfY\_t = gd\_dFOMp(a\_h[-\/1,:],Y\_h[-\/1,:],z\_p,y\_p,yadj\_p,O0\_p,N0\_p,ACT0\_p)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00172}00172     dfaYe\_t,dfYe\_t = gd\_dFOMe(a\_h[-\/1,:],Y\_h[-\/1,:],z\_e,y\_e,yadj\_e,O0\_e,N0\_e,ACT0\_e)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00173}00173     dfY\_p\_h = np.concatenate((dfY\_p\_h,np.reshape(dfY\_t,(1,len(dfY\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00174}00174     dfaY\_p\_h = np.concatenate((dfaY\_p\_h,np.reshape(dfaY\_t,(1,len(dfaY\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00175}00175     dfY\_e\_h = np.concatenate((dfY\_e\_h,np.reshape(dfYe\_t,(1,len(dfYe\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00176}00176 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00177}00177     \textcolor{comment}{\# calculate adjoint equations for Y}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00178}00178 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00179}00179     \textcolor{keywordflow}{if} (ii == 2): \textcolor{comment}{\# meaning no improvement from recalculating gradient}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00180}00180         \textcolor{comment}{\# change gamma}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00181}00181         print(\textcolor{stringliteral}{'Updating gamma'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00182}00182 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00183}00183         f0n = fX\_p\_h[-\/1,0]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00184}00184         X0n = X\_h[-\/1,:]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00185}00185         \textcolor{keywordflow}{while} fX\_p\_h[-\/1,0] >= f0n:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00186}00186             gammaX\_h = np.concatenate((gammaX\_h,np.array(gammaX\_h[-\/1,:]/2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00187}00187 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00188}00188             \textcolor{comment}{\# iterate X}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00189}00189             X\_t = X0n -\/ gammaX\_h[-\/1,0]*dfX\_p\_h[-\/1,:]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00190}00190             X\_h = np.concatenate((X\_h,np.reshape(X\_t,(1,len(X\_t)))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00191}00191 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00192}00192             \textcolor{comment}{\# compute FoM}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00193}00193             [f\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00194}00194             fX\_p\_h = np.concatenate((fX\_p\_h,np.array(f\_t).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00195}00195             PrintFoM(f\_t)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00196}00196         gammaY\_h =  np.concatenate((gammaY\_h,np.array(gammaX\_h[-\/1,:]).reshape((1,1))), axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00197}00197 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00198}00198         f0n = fa\_h[-\/1,0]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00199}00199         a0n = a\_h[-\/1,:]}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00200}00200         \textcolor{keywordflow}{while} fa\_h[-\/1,0] >= f0n:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00201}00201             gammaA\_h = np.concatenate((gammaA\_h,np.array(gammaA\_h[-\/1,:]/2.0).reshape((1,1))),axis=0)}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00202}00202 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00203}00203             \textcolor{comment}{\# iterate a}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00204}00204             a\_t = a0n -\/ (1/lam)*gammaA\_h[-\/1,0]*(dfaY\_p\_h[-\/1,:] -\/ dfaX\_p\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00205}00205             a\_h = np.concatenate((a\_h,np.reshape(a\_t,(1,len(a\_t)))),axis=0)  }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00206}00206 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00207}00207             \textcolor{comment}{\# compute FoM}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00208}00208             [fX\_t,\_] = gd\_FOMp(a\_h[-\/1,:],X\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00209}00209             [fY\_t,\_] = gd\_FOMp(a\_h[-\/1,:],Y\_h[-\/1,:])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00210}00210             fa\_h = np.concatenate((fa\_h,np.array((1/lam)*(fY\_t-\/fX\_t)).reshape((1,1))), axis=0) }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00211}00211             PrintFoM(fX\_t,\textcolor{stringliteral}{'Xp'})}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00212}00212             PrintFoM(fY\_t,\textcolor{stringliteral}{'Yp'})             }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00213}00213 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00214}00214     \textcolor{keywordflow}{if} fX\_p\_h[-\/1,0] < 5e-\/18:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00215}00215         \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00216}00216 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00217}00217     \textcolor{keywordflow}{if} len(fX\_p\_h[:,0]) > 5000:}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00218}00218         \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00219}00219 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00220}00220 SaveData(\textcolor{stringliteral}{"{}testx3"{}},[a0,X\_h,f\_h,dfX\_p\_h,gammaX\_h])}
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00221}00221 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00222}00222 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00223}00223 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00224}00224 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00225}00225 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00226}00226 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00227}00227 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00228}00228 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00229}00229 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00230}00230 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00231}00231 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00232}00232 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00233}00233 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00234}00234 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00235}00235 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00236}00236 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00237}00237 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00238}00238 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00239}00239 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00240}00240 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00241}00241 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00242}00242 }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00243}00243    }
+\DoxyCodeLine{\Hypertarget{gd__adj__match__2var___xa_8py_source_l00244}00244 }
+
+\end{DoxyCode}

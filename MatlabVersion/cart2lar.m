@@ -23,7 +23,7 @@ y_lar(:,6) = -y(:,5).*ls + y(:,6).*lc - 2*dphi.*y_lar(:,2);
 y_lar(:,10) = y(:,10) - 2*dphi.*y_lar(:,1);
 
 % E+,E-,Ex
-d = -y_lar(:,5).*ls - y_lar(:,6).*lc;
+ d = -y_lar(:,5).*ls - y_lar(:,6).*lc;
 e = -y_lar(:,2).*lc + y_lar(:,3).*ls;
 f = y_lar(:,5).*lc - y_lar(:,6).*ls;
 g = -y_lar(:,2).*ls - y_lar(:,3).*lc;

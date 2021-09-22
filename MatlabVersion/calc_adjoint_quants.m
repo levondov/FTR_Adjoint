@@ -15,7 +15,6 @@ function [Mq,Mp,Mn] = calc_adjoint_quants(Y,k_perv)
 
 % calculate all the required quantities for adjoint equations
 Q_delta = sqrt( Y(1)^2 - Y(2)^2 - Y(3)^2 );
-H = k_perv*log(Y(1) + Q_delta);
 Q_deltaplus = Q_delta + Y(1);
 
 V1 = -(k_perv/(Q_delta^2))*[Y(4)-Y(2)*Y(5)/Q_deltaplus-Y(3)*Y(6)/Q_deltaplus,

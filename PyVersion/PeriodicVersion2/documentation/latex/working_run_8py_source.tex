@@ -1,0 +1,39 @@
+\hypertarget{working_run_8py_source}{}\doxysection{working\+Run.\+py}
+\label{working_run_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/workingRun.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/workingRun.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00001}00001 \textcolor{comment}{\# -\/*-\/ coding: utf-\/8 -\/*-\/}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00002}00002 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00003}00003 \textcolor{stringliteral}{Created on Sun Sep 12 12:27:33 2021}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00004}00004 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00005}00005 \textcolor{stringliteral}{@author: levon}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00006}00006 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00007}00007 \textcolor{stringliteral}{Example script of running the moments with the new MomentSolver Class}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00008}00008 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00009}00009 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00010}00010 \textcolor{keyword}{from} Moments \textcolor{keyword}{import} MomentSolver}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00012}00012 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00013}00013 \textcolor{comment}{\# create momentSolver objects}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00014}00014 mom = MomentSolver(energy=10e3, current=0.0)}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00016}00016 \textcolor{comment}{\# change some properties}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00017}00017 mom.initialConditions = [1e-\/6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00018}00018 mom.h = 0.0001}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00019}00019 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00020}00020 \textcolor{comment}{\# define a quadrupole lattice}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00021}00021 dB = [0.02661, -\/0.02661, 0.02661] \textcolor{comment}{\# gradients [T/m]}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00022}00022 qstart = [0.0, 0.052125, 0.131375] \textcolor{comment}{\# start positions [m]}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00023}00023 qend = [0.027125, 0.106375, 0.1585] \textcolor{comment}{\# end positions [m]}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00024}00024 quadrot = [0.0, 0.0, 0.0] \textcolor{comment}{\# rotation angle [rad]}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00025}00025 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00026}00026 \textcolor{comment}{\# create lattice}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00027}00027 mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.1585, repeat=5, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00028}00028 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00029}00029 \textcolor{comment}{\# run moment solver and grab output}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00030}00030 z,y,motion,k = mom.RunMoments(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00031}00031 }
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00032}00032 \textcolor{comment}{\# plot beam size moments}}
+\DoxyCodeLine{\Hypertarget{working_run_8py_source_l00033}00033 mom.PlotBeamSize()}
+
+\end{DoxyCode}

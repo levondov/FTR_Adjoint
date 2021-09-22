@@ -1,0 +1,81 @@
+\hypertarget{example_run_o_o_p_8py_source}{}\doxysection{example\+Run\+OOP.\+py}
+\label{example_run_o_o_p_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/exampleRunOOP.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/exampleRunOOP.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00001}00001 \textcolor{comment}{\# -\/*-\/ coding: utf-\/8 -\/*-\/}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00002}00002 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00003}00003 \textcolor{stringliteral}{Created on Sun Sep 12 12:27:33 2021}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00004}00004 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00005}00005 \textcolor{stringliteral}{@author: levon}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00006}00006 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00007}00007 \textcolor{stringliteral}{Example script of running the moments with the new MomentSolver Class}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00008}00008 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00009}00009 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00010}00010 \textcolor{keyword}{from} Moments \textcolor{keyword}{import} MomentSolver}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00012}00012 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00013}00013 \textcolor{comment}{\# create momentSolver objects}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00014}00014 mom = MomentSolver(energy=5e3, current=3.0e-\/3)}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00016}00016 \textcolor{keywordflow}{if} 1:}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00017}00017     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00018}00018     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00019}00019     \textcolor{comment}{\# define a quadrupole lattice}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00020}00020     dB = [-\/0.20157, 0.24166, -\/0.19439] \textcolor{comment}{\# gradients [T/m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00021}00021     qstart = [0.00444, 0.12462, 0.2232] \textcolor{comment}{\# start positions [m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00022}00022     qend = [0.01444, 0.13462, 0.2332] \textcolor{comment}{\# end positions [m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00023}00023     quadrot = [0.883077, 0.8406295, 0.8419267] \textcolor{comment}{\# rotation angle [rad]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00024}00024     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00025}00025     \textcolor{comment}{\# create lattice}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00026}00026     mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.322, repeat=1, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00027}00027     \textcolor{comment}{\# run moment solver and grab output}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00028}00028     z,y,motion,k = mom.RunMoments(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00029}00029     z,y,ym,mot,k = mom.RunMomentsAdjoint(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00030}00030     \textcolor{comment}{\# plot beam size moments}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00031}00031     mom.PlotBeamSize()}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00032}00032     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00033}00033 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00034}00034 \textcolor{keywordflow}{if} 0:    }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00035}00035     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00036}00036     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00037}00037     \textcolor{comment}{\# let's make the previous lattice periodicity equal to 3 and repeat the integration}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00038}00038     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00039}00039     \textcolor{comment}{\# create lattice , note the change to the repeat variable since we want a 3x periodicity}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00040}00040     mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.275, repeat=3, verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00041}00041     \textcolor{comment}{\# run moment solver and grab output}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00042}00042     z,y,motion,k = mom.RunMoments(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00043}00043     \textcolor{comment}{\# plot beam size moments}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00044}00044     mom.PlotBeamSize()}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00045}00045 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00046}00046 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00047}00047 \textcolor{keywordflow}{if} 0:}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00048}00048     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00049}00049     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00050}00050     \textcolor{comment}{\# define a quadrupole lattice}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00051}00051     dB = [0.02661, -\/0.02661, 0.02661] \textcolor{comment}{\# gradients [T/m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00052}00052     qstart = [0.0, 0.052125, 0.131375] \textcolor{comment}{\# start positions [m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00053}00053     qend = [0.027125, 0.106375, 0.1585] \textcolor{comment}{\# end positions [m]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00054}00054     quadrot = [0.0, 0.0, 0.0] \textcolor{comment}{\# rotation angle [rad]}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00055}00055     }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00056}00056     \textcolor{comment}{\# create lattice}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00057}00057     mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.1585, repeat=4, verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00058}00058     \textcolor{comment}{\# adjust beam properties}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00059}00059     mom.energy = 10e3}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00060}00060     mom.current = 0.67e-\/3}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00061}00061     mom.initialConditions = [1e-\/6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00062}00062     mom.h = 0.0001}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00063}00063     mom.CalculateBeamProperties()}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00064}00064     \textcolor{comment}{\# run moment solver and grab output}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00065}00065     z,y,motion,k = mom.RunMoments(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00066}00066     \textcolor{comment}{\# plot beam size moments}}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00067}00067     mom.PlotBeamSize()}
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00068}00068 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00069}00069 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00070}00070 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00071}00071 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00072}00072 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00073}00073 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00074}00074 }
+\DoxyCodeLine{\Hypertarget{example_run_o_o_p_8py_source_l00075}00075 }
+
+\end{DoxyCode}

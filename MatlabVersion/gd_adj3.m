@@ -6,7 +6,7 @@
 
 % Gradient descent with adjoint stuff
 global k_perv k0 hardedge_flag e1 e2
-k_perv = c2perv(5.0e-3);
+k_perv = c2perv(3.0e-3);
 k0 = 7;
 e1 = 0.0;
 e2 = 1.0;
@@ -18,17 +18,20 @@ flag_nosoldmove = 1;
 %1.020022195126994
 
 an = [
-   1.141197183085769
-   1.240381289920853
-   0.971670502689810
-   1.099600025476628
-   1.210342963351092
-   1.146908990747882
-   1.080218196594953
-   1.002807847180152
-   1.067835788684638
-   0.988742610685236
-   1.042335063188109]';      
+    0.0
+    0.0
+    0.971670502689810
+    1.099600025476628
+    1.210342963351092
+    1.146908990747882
+    1.080218196594953
+    1.002807847180152
+    1.067835788684638
+    0.988742610685236
+    1.042335063188109]';
+
+an = ones(1,11);
+an(1) = 0.0; an(2) = 0.0;
 
 %an = [1.15, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
 
@@ -36,7 +39,8 @@ if flag_noangle
     an(9:11) = 1.0;
 end
 if flag_nosoldmove
-    an(1) = 1.10;
+    an(1) = 0.0;
+    an(2) = 0.0;
 end
 
 %an = ones(1,11); an(1) = 1.10;
@@ -54,8 +58,8 @@ gamma = (f0/sum(df0.^2));
 
 %%
 gamma_h = gamma;
-an_h = an; 
-f_h = f0; 
+an_h = an;
+f_h = f0;
 fp_h = f0p;
 df_h =df0;
 
@@ -67,6 +71,7 @@ if flag_noangle
 end
 if flag_nosoldmove
     an_h(end,1) = an(1);
+    an_h(end,2) = an(2);
 end
 [f_h(end+1),fp_h(end+1,:)] = gd_F(an_h(end,:)); % get FoM
 fprintf(['FoM: ',num2str(f_h(end)),'\n']);
@@ -78,6 +83,7 @@ while f_h(end) >= f0
     end
     if flag_nosoldmove
         an_h(end,1) = an(1);
+        an_h(end,2) = an(2);
     end
     [f_h(end+1),fp_h(end+1,:)] = gd_F(an_h(end,:)); % get FoM
     fprintf(['FoM: ',num2str(f_h(end)),'\n']);
@@ -85,7 +91,7 @@ end
 %%
 while 1
     ii=1;
-    while f_h(end) < f_h(end-1)        
+    while f_h(end) < f_h(end-1)
         fprintf(['Iterating ',num2str(ii),'\n']);
         
         % iterate
@@ -95,7 +101,8 @@ while 1
             an_h(end,9:11) = 1; %% ANGLE
         end
         if flag_nosoldmove
-            an_h(end,1) = an(1);            
+            an_h(end,1) = an(1);
+            an_h(end,2) = an(2);
         end
         
         % compute fom
@@ -107,17 +114,18 @@ while 1
             gamma_h(end+1) = gamma_h(end)*2.0;
         end
     end
-
+    
     % recompute adjoint equation stuff for new direction
     fprintf(['Recomputing adjoint equations \n']);
     
     % grab last good settings
-    an_h(end+1,:) = an_h(end-1,:);  
+    an_h(end+1,:) = an_h(end-1,:);
     if flag_noangle
         an_h(end,9:11) = 1; %% ANGLE
     end
     if flag_nosoldmove
         an_h(end,1) = an(1);
+        an_h(end,2) = an(2);
     end
     f_h(end+1) = f_h(end-1);
     fp_h(end+1,:) = fp_h(end-1,:);
@@ -142,7 +150,8 @@ while 1
             end
             if flag_nosoldmove
                 an_h(end,1) = an(1);
-            end            
+                an_h(end,2) = an(2);
+            end
             [f_h(end+1),fp_h(end+1,:)] = gd_F(an_h(end,:)); % get FoM
             fprintf(['FoM: ',num2str(f_h(end)),'\n']);
         end
@@ -153,7 +162,7 @@ while 1
     %gamma_h(:,end+1) = gamma;
     
     if f_h(end) < 1e-15
-       break; 
+        break;
     end
     if length(f_h) > 5000
         break;

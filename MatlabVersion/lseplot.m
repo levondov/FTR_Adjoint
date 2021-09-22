@@ -20,7 +20,13 @@ ylabel('P+,P-,Px [m]'); xlabel('z [m]'); grid on; ylim([-1e-4,1e-4]);
 
 global k_solv zv
 kidx = find(k_solv ~= 0,1);
-zidx = find(z >= zv(kidx),1) - 1;
+if (isempty(kidx)) 
+    kidx=1; 
+    zidx=1;
+else
+    zidx = find(z >= zv(kidx),1) - 1;
+end
+
 komega = zeros(length(z),1);
 komega(zidx:end) = k_solv(kidx);
 

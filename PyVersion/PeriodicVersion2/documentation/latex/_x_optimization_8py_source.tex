@@ -1,0 +1,92 @@
+\hypertarget{_x_optimization_8py_source}{}\doxysection{XOptimization.\+py}
+\label{_x_optimization_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/XOptimization.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/XOptimization.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00001}00001 \textcolor{comment}{\# -\/*-\/ coding: utf-\/8 -\/*-\/}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00002}00002 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00003}00003 \textcolor{stringliteral}{Created on Mon Sep 13 20:54:20 2021}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00004}00004 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00005}00005 \textcolor{stringliteral}{@author: levon}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00006}00006 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00007}00007 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00008}00008 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00009}00009 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00010}00010 \textcolor{keyword}{from} Moments \textcolor{keyword}{import} MomentSolver}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00012}00012 \textcolor{keyword}{def }a2params(a):}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00013}00013     dB = [0.02661, -\/0.02661, 0.02661] \textcolor{comment}{\# gradients [T/m]}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00014}00014     \textcolor{keywordflow}{return} [dB[0]*a[0], dB[1]*a[1], dB[2]*a[2]]}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00015}00015 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00016}00016 \textcolor{keyword}{def }UpdateLattice(mom,a):}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00017}00017     \textcolor{comment}{\# define a quadrupole lattice}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00018}00018     dB = a2params(a) \textcolor{comment}{\# gradients [T/m]}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00019}00019     qstart = [0.0, 0.052125, 0.131375] \textcolor{comment}{\# start positions [m]}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00020}00020     qend = [0.027125, 0.106375, 0.1585] \textcolor{comment}{\# end positions [m]}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00021}00021     quadrot = [0.0, 0.0, 0.0] \textcolor{comment}{\# rotation angle [rad]}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00022}00022     }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00023}00023     \textcolor{comment}{\# create lattice}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00024}00024     mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.1585, repeat=5, verbose=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00025}00025     }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00026}00026     \textcolor{keywordflow}{return} mom}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00027}00027 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00028}00028 \textcolor{keyword}{def }GetdF(mom, a):}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00029}00029 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00030}00030     \textcolor{comment}{\# grab base O and N matrices}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00031}00031     OmatBase = np.copy(mom.Omat)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00032}00032     NmatBase = np.copy(mom.Nmat)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00033}00033     }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00034}00034     \textcolor{comment}{\# copy the params and dF creation}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00035}00035     aCopy = np.copy(a)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00036}00036     dF = np.zeros((1,len(a)))}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00037}00037 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00038}00038     perturb = 0.01    }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00039}00039     \textcolor{keywordflow}{for} i,ai \textcolor{keywordflow}{in} enumerate(aCopy):}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00040}00040         }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00041}00041         \textcolor{comment}{\# perturb a parameter}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00042}00042         a[i] = aCopy[i] + aCopy[i]*perturb}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00043}00043         }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00044}00044         \textcolor{comment}{\# reGenerate lattice}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00045}00045         mom = UpdateLattice(mom, a)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00046}00046         }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00047}00047         \textcolor{comment}{\# reCalculate new O,N matrix}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00048}00048         Onew, Nnew = mom.RecalculateON()}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00049}00049 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00050}00050         \textcolor{comment}{\# calculate perturbation in O and N matrix}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00051}00051         \textcolor{keywordflow}{for} j \textcolor{keywordflow}{in} range(len(mom.z)):}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00052}00052             Onew[0,j] = Onew[0,j] -\/ OmatBase[0,j]}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00053}00053             Nnew[0,j] = Nnew[0,j] -\/ NmatBase[0,j]}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00054}00054     }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00055}00055         \textcolor{comment}{\# calculate the adjoint integral via O and N matrix perturbation}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00056}00056         dF[0,i] = mom.GetAdjointIntegral(Onew, Nnew)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00057}00057     }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00058}00058     \textcolor{keywordflow}{return} dF}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00059}00059 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00060}00060 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00063}00063 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00064}00064 \textcolor{comment}{\# tuning parameters}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00065}00065 an = [1, 1, 1]}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00066}00066 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00067}00067 \textcolor{comment}{\# initial moments}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00068}00068 X0 = [1e-\/6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] \textcolor{comment}{\# initial conditions for the beam}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00069}00069 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00070}00070 \textcolor{comment}{\# create momentSolver objects}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00071}00071 mom = MomentSolver(energy=10e3, current=0.0, initialMoments=X0)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00072}00072 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00073}00073 \textcolor{comment}{\# create lattice}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00074}00074 mom = UpdateLattice(mom, an)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00075}00075 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00076}00076 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00079}00079 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00080}00080 \textcolor{comment}{\# compute adjoint equations}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00081}00081 mom.RunMoments(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00082}00082 mom.RunMomentsAdjoint(verbose=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00083}00083 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00084}00084 \textcolor{comment}{\# compute initial FoM values}}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00085}00085 f0,\_,\_,\_ = mom.GetFoMAndDFoM()}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00086}00086 df0 = GetdF(mom, an)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00087}00087 gamma0 = f0 / np.sum(df0**2)}
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00088}00088 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00089}00089 }
+\DoxyCodeLine{\Hypertarget{_x_optimization_8py_source_l00090}00090 }
+
+\end{DoxyCode}

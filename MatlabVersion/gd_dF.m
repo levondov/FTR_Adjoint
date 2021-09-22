@@ -53,7 +53,7 @@ for i = 1:length(a)
     f4_tmp = ( y(ii,7) - 0.5*(komega^2)*y(ii,1) + k_perv );
     tmp5 = k0^(-2) * f5_tmp * e2 * ( 0.5*y(ii,1) - 0.5*y(ii,10)*(1/komega) );
     tmp4 = k0^(-2) * f4_tmp * e1 * ( -0.5*y(ii,1) );
-    df(i) = tmp + tmp5 + tmp4;% / ((k0^2) * (y(1,1)^2));
+    df(i) = tmp;% + tmp5 + tmp4;% / ((k0^2) * (y(1,1)^2));
     %df(i) = tmp / (a_copy(i)*perturb);
     
     a(i) = a_copy(i); % reset

@@ -1,0 +1,658 @@
+\hypertarget{_moments_8py_source}{}\doxysection{Moments.\+py}
+\label{_moments_8py_source}\index{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/Moments.py@{C:/Users/levon/Downloads/FTR\_Adjoint/PyVersion/PeriodicVersion2/Moments.py}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00001}00001 \textcolor{comment}{\# -\/*-\/ coding: utf-\/8 -\/*-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00002}00002 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00003}00003 \textcolor{stringliteral}{Created on Sun Sep 12 12:21:15 2021}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00004}00004 \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00005}00005 \textcolor{stringliteral}{@author: levon}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00006}00006 \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00007}00007 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00008}00008 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00009}00009 \textcolor{keyword}{import} matplotlib.pyplot \textcolor{keyword}{as} plt}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00010}00010 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00014}\mbox{\hyperlink{class_moments_1_1_moment_solver}{00014}} \textcolor{keyword}{class }\mbox{\hyperlink{class_moments_1_1_moment_solver}{MomentSolver}}:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00015}00015     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00016}00016     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00021}\mbox{\hyperlink{class_moments_1_1_moment_solver_a3b39c911d042050633d752e0e9b78c68}{00021}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a3b39c911d042050633d752e0e9b78c68}{\_\_init\_\_}}(self, energy=10e3, current=0.0, pipeRadius=0.0, initialMoments=None):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00022}00022         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00023}00023         \textcolor{comment}{\# grab physics parameters}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00024}00024         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00025}\mbox{\hyperlink{class_moments_1_1_moment_solver_ac526153d8fad64f5085b20965f9f5a32}{00025}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac526153d8fad64f5085b20965f9f5a32}{energy}}energy = energy}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00026}00026         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00027}\mbox{\hyperlink{class_moments_1_1_moment_solver_a79804fadcd21e90822d030a9b1d01905}{00027}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79804fadcd21e90822d030a9b1d01905}{current}}current = current}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00028}00028         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00029}\mbox{\hyperlink{class_moments_1_1_moment_solver_a7b3bcd33ddc430a8736442255950c319}{00029}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a7b3bcd33ddc430a8736442255950c319}{pipeRadius}}pipeRadius = pipeRadius}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00030}00030         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00031}\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{00031}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00032}00032         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00033}\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{00033}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00034}00034         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00035}00035         \textcolor{comment}{\# generate some more physics parameters}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00036}00036         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a209312167367a05653af1f60365de585}{\_\_Get\_beamridg\_and\_perv}}\_\_Get\_beamridg\_and\_perv(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac526153d8fad64f5085b20965f9f5a32}{energy}}energy, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79804fadcd21e90822d030a9b1d01905}{current}}current) }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00037}00037         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00038}00038         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00039}\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{00039}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{lattice}}lattice = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00040}00040         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00041}\mbox{\hyperlink{class_moments_1_1_moment_solver_a12c5635f327114e902ec6f1081996d51}{00041}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a12c5635f327114e902ec6f1081996d51}{latticeReversed}}latticeReversed = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00042}00042         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00043}\mbox{\hyperlink{class_moments_1_1_moment_solver_ae5604b9136d6aeee4950df5bccf85e17}{00043}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae5604b9136d6aeee4950df5bccf85e17}{zstart}}zstart = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00044}00044         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00045}\mbox{\hyperlink{class_moments_1_1_moment_solver_ae1282575cf9f43a2dc43a9c070c20263}{00045}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae1282575cf9f43a2dc43a9c070c20263}{zend}}zend = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00046}00046         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00047}00047         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00048}\mbox{\hyperlink{class_moments_1_1_moment_solver_abe095a79419757c5306065395c585614}{00048}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_abe095a79419757c5306065395c585614}{h}}h = 0.0001}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00049}00049         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00050}\mbox{\hyperlink{class_moments_1_1_moment_solver_a00973ac8c1e491be3db7c19133a70531}{00050}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a00973ac8c1e491be3db7c19133a70531}{hReversed}}hReversed = -\/0.0001}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00051}00051         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00052}00052         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00053}\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{00053}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00054}00054         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00055}\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{00055}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00056}00056         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00057}\mbox{\hyperlink{class_moments_1_1_moment_solver_a97cb0df4d5b1da51bc9d585e05886ef6}{00057}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a97cb0df4d5b1da51bc9d585e05886ef6}{k}}k = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00058}00058         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00059}\mbox{\hyperlink{class_moments_1_1_moment_solver_a3f7a965902a692079e31c517534e9e9e}{00059}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a3f7a965902a692079e31c517534e9e9e}{yOri}}yOri = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00060}00060         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00061}\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{00061}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00062}00062         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00063}\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{00063}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{zAdj}}zAdj = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00064}00064         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00065}\mbox{\hyperlink{class_moments_1_1_moment_solver_aa90dc1afc391920e06d5e66146748a5f}{00065}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aa90dc1afc391920e06d5e66146748a5f}{kAdj}}kAdj = \textcolor{keywordtype}{None}     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00066}00066         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00067}00067         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00068}\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{00068}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0 = 7}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00069}00069         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00070}\mbox{\hyperlink{class_moments_1_1_moment_solver_a66a71f05ccc134e7768da9821bda47b3}{00070}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a66a71f05ccc134e7768da9821bda47b3}{Omat}}Omat = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00071}00071         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00072}\mbox{\hyperlink{class_moments_1_1_moment_solver_a573f6683b3f8f860dcd8af603851b9a0}{00072}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a573f6683b3f8f860dcd8af603851b9a0}{Nmat}}Nmat = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00073}00073         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00074}00074         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00075}\mbox{\hyperlink{class_moments_1_1_moment_solver_a79ee16dcd120c89870894c8fed5ae25e}{00075}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79ee16dcd120c89870894c8fed5ae25e}{initialConditions}}initialConditions = initialMoments}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00076}00076         \textcolor{keywordflow}{if} initialMoments == \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00077}00077             self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79ee16dcd120c89870894c8fed5ae25e}{initialConditions}}initialConditions = [}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00078}00078                 0.5*(2.2581**2*1e-\/6 + 0.2258**2*1e-\/6), \textcolor{comment}{\# Q+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00079}00079                 0.5*(2.2581**2*1e-\/6 -\/ 0.2258**2*1e-\/6), \textcolor{comment}{\# Q-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00080}00080                 0.0, \textcolor{comment}{\# Qx}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00081}00081                 0.0, \textcolor{comment}{\# P+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00082}00082                 0.0, \textcolor{comment}{\# P-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00083}00083                 0.0, \textcolor{comment}{\# Px}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00084}00084                 (7.0855**2*1e-\/6 + 0.70855**2*1e-\/6), \textcolor{comment}{\# E+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00085}00085                 (7.0855**2*1e-\/6 -\/ 0.70855**2*1e-\/6), \textcolor{comment}{\# E-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00086}00086                 0.0, \textcolor{comment}{\# Ex}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00087}00087                 0.0, \textcolor{comment}{\# L}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00088}00088                 0.0  \textcolor{comment}{\# phi , used for solenoid larmor rotations, is always 0 unless we include a solenoid         }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00089}00089                 ]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00090}00090             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00091}00091         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00092}\mbox{\hyperlink{class_moments_1_1_moment_solver_aeb64430a1136bf2ab121f8385977ca58}{00092}}         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aeb64430a1136bf2ab121f8385977ca58}{initialMomentsAdjoint}}initialMomentsAdjoint = \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00093}00093             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00094}00094         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00095}00095     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00104}\mbox{\hyperlink{class_moments_1_1_moment_solver_ab1f3c67679404230fe4a581e58331b74}{00104}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_ab1f3c67679404230fe4a581e58331b74}{CreateLatticeProfile}}(self, dB=[1.0], qstart=[0.0], qend=[0.1], qrot=[0.0], zstart=0, zend=1, repeat=1, verbose=False):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00105}00105         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00106}00106         Nquads = len(dB) \textcolor{comment}{\# number of quads}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00107}00107         numCols = 4 \textcolor{comment}{\# q start, q end, k strength, q rot}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00108}00108         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00109}00109         tmpLattice = np.zeros((1, numCols))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00110}00110         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00111}00111         \textcolor{comment}{\# drift from z start to q1 start}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00112}00112         tmpLattice[0,:] = [zstart, qstart[0], 0.0, 0.0]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00113}00113         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00114}00114         \textcolor{comment}{\# loop through each quad and add to the lattice}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00115}00115         \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(Nquads):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00116}00116             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00117}00117             \textcolor{comment}{\# add quad to lattice}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00118}00118             tmpQuadPos = [[qstart[i], qend[i], dB[i], qrot[i]]]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00119}00119             tmpLattice = np.concatenate((tmpLattice, tmpQuadPos), axis=0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00120}00120             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00121}00121             \textcolor{comment}{\# if this is not the last quad yet, add in the drift to the next quad}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00122}00122             \textcolor{keywordflow}{if} (i+1) < Nquads:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00123}00123                 tmpDrftPos = [[qend[i], qstart[i+1], 0.0, 0.0]]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00124}00124                 tmpLattice = np.concatenate((tmpLattice, tmpDrftPos), axis=0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00125}00125                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00126}00126         \textcolor{comment}{\# drfit from last q end to z end}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00127}00127         tmpDrftPos = [[qend[-\/1], zend, 0.0, 0.0]]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00128}00128         tmpLattice = np.concatenate((tmpLattice, tmpDrftPos), axis=0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00129}00129         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00130}00130         \textcolor{comment}{\# are we repeating the lattice?}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00131}00131         \textcolor{keywordflow}{if} repeat > 1:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00132}00132             \textcolor{comment}{\# make a copy of the lattice}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00133}00133             copyTmpLattice = np.copy(tmpLattice)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00134}00134             \textcolor{keywordflow}{for} ii \textcolor{keywordflow}{in} range(repeat-\/1):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00135}00135                 \textcolor{comment}{\# grab the ending location of the last element}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00136}00136                 zendPos = tmpLattice[-\/1,1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00137}00137                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00138}00138                 \textcolor{comment}{\# create a copy of the lattice}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00139}00139                 newLatticePiece = np.copy(copyTmpLattice)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00140}00140                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00141}00141                 \textcolor{comment}{\# adjust the starting and ending positions of this new piece}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00142}00142                 newLatticePiece[:,0:2] += zendPos}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00143}00143                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00144}00144                 \textcolor{comment}{\# append to the tmp lattce}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00145}00145                 tmpLattice = np.concatenate((tmpLattice, newLatticePiece), axis=0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00146}00146                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00147}00147         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00148}00148         \textcolor{comment}{\# create a reversed lattice for backwards integration}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00149}00149         latticeReversed = np.copy(tmpLattice)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00150}00150         latticeReversed[:,0] = np.flip(tmpLattice[:,1])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00151}00151         latticeReversed[:,1] = np.flip(tmpLattice[:,0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00152}00152         latticeReversed[:,2] = np.flip(tmpLattice[:,2])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00153}00153         latticeReversed[:,3] = np.flip(tmpLattice[:,3])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00154}00154         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00155}00155         \textcolor{comment}{\# assign to class parameter}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00156}00156         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{lattice}}lattice = tmpLattice}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00157}00157         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a12c5635f327114e902ec6f1081996d51}{latticeReversed}}latticeReversed = latticeReversed}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00158}00158         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae5604b9136d6aeee4950df5bccf85e17}{zstart}}zstart = zstart}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00159}00159         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae1282575cf9f43a2dc43a9c070c20263}{zend}}zend = zend}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00160}00160         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00161}00161         \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00162}00162             print(\textcolor{stringliteral}{'Start | End | k strength | quad rotation'})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00163}00163             print(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{lattice}}lattice)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00164}00164 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00165}00165     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00172}\mbox{\hyperlink{class_moments_1_1_moment_solver_afe64c01bdd8a7a86bf38c9a844b618b7}{00172}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_afe64c01bdd8a7a86bf38c9a844b618b7}{RunMoments}}(self, verbose=False):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00173}00173         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00174}00174         \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00175}00175             print(\textcolor{stringliteral}{"{}Forward"{}})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00176}00176         odefunc = \textcolor{keyword}{lambda} z,Y,dbdx,rot : self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a8474f9bf5f1cc4acbf0fb415f113e5bd}{\_\_ode\_moments}}\_\_ode\_moments(z,Y,dbdx,rot)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00177}00177         z,y,k,Omat,Nmat = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aaaf3b24bc45b737ccff3a1389d0ad8ed}{\_\_ode3}}\_\_ode3(odefunc, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_abe095a79419757c5306065395c585614}{h}}h, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79ee16dcd120c89870894c8fed5ae25e}{initialConditions}}initialConditions, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{lattice}}lattice, verbose=verbose)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00178}00178         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00179}00179         \textcolor{comment}{\# assign variables}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00180}00180         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z = z}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00181}00181         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y = y}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00182}00182         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a97cb0df4d5b1da51bc9d585e05886ef6}{k}}k = k}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00183}00183         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a66a71f05ccc134e7768da9821bda47b3}{Omat}}Omat = Omat}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00184}00184         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a573f6683b3f8f860dcd8af603851b9a0}{Nmat}}Nmat = Nmat}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00185}00185     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00186}00186         \textcolor{comment}{\# Constant of Motion }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00187}00187         motion = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_af4c5cf9a4f374544895d09a21928acb0}{GetCOM}}GetCOM(y)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00188}00188         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00189}00189         \textcolor{comment}{\# calculate initial conditions for adjoint equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00190}00190         \_,\_,\_,dFoMpFinal = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_abb36f939520f4fe11ebeb0744d0b0c7e}{GetFoMAndDFoM}}GetFoMAndDFoM(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00191}00191         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aeb64430a1136bf2ab121f8385977ca58}{initialMomentsAdjoint}}initialMomentsAdjoint = np.concatenate((dFoMpFinal,y[:,-\/1]))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00192}00192         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00193}00193         \textcolor{keywordflow}{return} z,y,motion,k}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00194}00194     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00195}00195     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00203}\mbox{\hyperlink{class_moments_1_1_moment_solver_a84555a18679c500c3ffd94714dd65dd1}{00203}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a84555a18679c500c3ffd94714dd65dd1}{RunMomentsAdjoint}}(self, verbose=False):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00204}00204 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00205}00205         \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00206}00206             print(\textcolor{stringliteral}{"{}Reverse"{}})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00207}00207         odefunc = \textcolor{keyword}{lambda} z,Y,dbdx,rot : self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a5b832ceb0a245d4d449fe18eccee807c}{\_\_ode\_moments\_adjoint}}\_\_ode\_moments\_adjoint(z,Y,dbdx,rot)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00208}00208         z,y,k,\_,\_ = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aaaf3b24bc45b737ccff3a1389d0ad8ed}{\_\_ode3}}\_\_ode3(odefunc, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a00973ac8c1e491be3db7c19133a70531}{hReversed}}hReversed, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aeb64430a1136bf2ab121f8385977ca58}{initialMomentsAdjoint}}initialMomentsAdjoint, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a12c5635f327114e902ec6f1081996d51}{latticeReversed}}latticeReversed, verbose=verbose)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00209}00209         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00210}00210         y\_mom = np.flip(y[11:,:],1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00211}00211         y\_adj = np.flip(y[0:11,:],1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00212}00212         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00213}00213         \textcolor{comment}{\# assign variables}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00214}00214         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a3f7a965902a692079e31c517534e9e9e}{yOri}}yOri = y\_mom}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00215}00215         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj = y\_adj}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00216}00216         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{zAdj}}zAdj = np.flip(z)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00217}00217         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aa90dc1afc391920e06d5e66146748a5f}{kAdj}}kAdj = np.flip(k)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00218}00218         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00219}00219         \textcolor{comment}{\# Constant of Motion}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00220}00220         motion = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_af4c5cf9a4f374544895d09a21928acb0}{GetCOM}}GetCOM(y)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00221}00221         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00222}00222         \textcolor{keywordflow}{return} np.flip(z),y\_mom,y\_adj,motion, np.flip(k)    }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00223}00223         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00224}00224     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00227}\mbox{\hyperlink{class_moments_1_1_moment_solver_ad57164fbc898a0825fc22894c8fc02b4}{00227}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_ad57164fbc898a0825fc22894c8fc02b4}{CalculateBeamProperties}}(self):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00228}00228         \textcolor{comment}{\# generate some more physics parameters}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00229}00229         self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a209312167367a05653af1f60365de585}{\_\_Get\_beamridg\_and\_perv}}\_\_Get\_beamridg\_and\_perv(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac526153d8fad64f5085b20965f9f5a32}{energy}}energy, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a79804fadcd21e90822d030a9b1d01905}{current}}current)         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00230}00230     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00231}00231     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00234}\mbox{\hyperlink{class_moments_1_1_moment_solver_af4c5cf9a4f374544895d09a21928acb0}{00234}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_af4c5cf9a4f374544895d09a21928acb0}{GetCOM}}(self, y):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00235}00235         L = y[9,:]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00236}00236         EQ = y[6,:]*y[0,:] + y[7,:]*y[1,:] + y[8,:]*y[2,:]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00237}00237         PP = y[3,:]**2 + y[4,:]**2 + y[5,:]**2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00238}00238         motion = EQ + (0.5)*L**2 -\/ (0.5)*PP}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00239}00239         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00240}00240         \textcolor{keywordflow}{return} motion}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00241}00241     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00242}00242     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00250}\mbox{\hyperlink{class_moments_1_1_moment_solver_abb36f939520f4fe11ebeb0744d0b0c7e}{00250}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_abb36f939520f4fe11ebeb0744d0b0c7e}{GetFoMAndDFoM}}(self, Y=None):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00251}00251         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00252}00252         \textcolor{comment}{\# if no user input, use the set of last calculated Y values from moments run}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00253}00253         \textcolor{keywordflow}{if} Y \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00254}00254             Y = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00255}00255             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00256}00256         \textcolor{comment}{\# new FoM matching condition}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00257}00257         \textcolor{keywordflow}{if} 1:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00258}00258             \textcolor{comment}{\# figure of merit broken into pieces for ease of reading    }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00259}00259             FoM1 = 0.5*np.sum( (Y[0:3,-\/1]-\/Y[0:3,0])**2 )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**2.}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00260}00260             FoM2 = 0.5*np.sum( (Y[3:6,-\/1]-\/Y[3:6,0])**2 )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00261}00261             FoM3 = 0.5*np.sum( (Y[6:9,-\/1]-\/Y[6:9,0])**2 )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00262}00262             FoM4 = 0.5*np.sum( (Y[9,-\/1]-\/Y[9,0])**2 )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00263}00263                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00264}00264             FoM = FoM1 + FoM2 + FoM3 + FoM4}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00265}00265             FoMp = np.array([FoM1,FoM2,FoM3,FoM4])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00266}00266             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00267}00267             \textcolor{comment}{\# derivative of FoM with respect to Q,P,E,L}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00268}00268             \textcolor{comment}{\# dF/dQ}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00269}00269             dQ\_p = ( Y[0,-\/1]-\/Y[0,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**2.}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00270}00270             dQ\_m = ( Y[1,-\/1]-\/Y[1,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**2.}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00271}00271             dQ\_x = ( Y[2,-\/1]-\/Y[2,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**2.}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00272}00272             \textcolor{comment}{\# dF/dP}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00273}00273             dP\_p = ( Y[3,-\/1]-\/Y[3,0] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00274}00274             dP\_m = ( Y[4,-\/1]-\/Y[4,0] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00275}00275             dP\_x = ( Y[5,-\/1]-\/Y[5,0] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00276}00276             \textcolor{comment}{\# dF/dE}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00277}00277             dE\_p = ( Y[6,-\/1]-\/Y[6,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00278}00278             dE\_m = ( Y[7,-\/1]-\/Y[7,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00279}00279             dE\_x = ( Y[8,-\/1]-\/Y[8,0] )*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2.)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00280}00280             \textcolor{comment}{\# dF/dL}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00281}00281             dL = np.abs( Y[9,-\/1]-\/Y[9,0] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00282}00282             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00283}00283             dFoMp = np.array([dQ\_p,dQ\_m,dQ\_x,dP\_p,dP\_m,dP\_x,dE\_p,dE\_m,dE\_x,dL,0.0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00284}00284             dFoMpFinal = np.array([-\/dE\_p, -\/dE\_m, -\/dE\_x, dP\_p, dP\_m, dP\_x, -\/dQ\_p, -\/dQ\_m, -\/dQ\_x, -\/dL, 0.0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00285}00285             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00286}00286         \textcolor{comment}{\# old FoM from FTR}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00287}00287         \textcolor{keywordflow}{if} 0:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00288}00288             e1 = 0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00289}00289             e2 = 1}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00290}00290             \textcolor{comment}{\# figure of merit kiss 2 no force balance (FoM4)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00291}00291             f5\_tmp = ( Y[6,-\/1] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00292}00292             f4\_tmp = ( Y[6,-\/1] + self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00293}00293             FoM1 = 0.5*( Y[4,-\/1]**2 + Y[5,-\/1]**2 ) + 0.5*Y[3,-\/1]**2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00294}00294             FoM2 = 0.5*(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**2)*(Y[1,-\/1]**2 + Y[2,-\/1]**2)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00295}00295             FoM3 = 0.5*(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2))*(Y[7,-\/1]**2+Y[8,-\/1]**2)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00296}00296             FoM4 = 0.5*(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2))*e1*(f4\_tmp)**2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00297}00297             FoM5 = (self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2))*0.5*e2*(f5\_tmp)**2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00298}00298             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00299}00299             FoM = FoM1 + FoM2 + FoM3 + FoM4 + FoM5}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00300}00300             FoMp = np.array([FoM1,FoM2,FoM3,FoM4,FoM5])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00301}00301             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00302}00302             dP\_p = Y[3,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00303}00303             dP\_m = Y[4,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00304}00304             dP\_x = Y[5,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00305}00305             dE\_p = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00306}00306             dE\_m = -\/self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(2)*Y[1,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00307}00307             dE\_x = -\/self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(2)*Y[2,-\/1] }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00308}00308             dQ\_p = (self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2))*e2*(f5\_tmp)*(-\/1) + (self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2))*e1*(f4\_tmp)*(-\/1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00309}00309             dQ\_m = -\/self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2)*Y[7,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00310}00310             dQ\_x = -\/self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a965ed8edb4ada13242bd97f0b7d984df}{k0}}k0**(-\/2)*Y[8,-\/1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00311}00311             dL = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00312}00312             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00313}00313             dFoMp = np.array([dQ\_p,dQ\_m,dQ\_x,dP\_p,dP\_m,dP\_x,dE\_p,dE\_m,dE\_x,dL,0.0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00314}00314             dFoMpFinal = np.array([dQ\_p, dQ\_m, dQ\_x, dP\_p, dP\_m, dP\_x, dE\_p, dE\_m, dE\_x, -\/dL, 0.0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00315}00315         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00316}00316         \textcolor{keywordflow}{return} FoM, FoMp, dFoMp, dFoMpFinal}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00317}00317         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00318}00318     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00323}\mbox{\hyperlink{class_moments_1_1_moment_solver_a92f4b9c78c9e0be878e933ba91fdf720}{00323}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a92f4b9c78c9e0be878e933ba91fdf720}{GetAdjointIntegral}}(self, Omat, Nmat):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00324}00324         int1 = np.zeros(len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00325}00325         int2 = np.zeros(len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00326}00326         int3 = np.zeros(len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00327}00327         int4 = np.zeros(len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00328}00328         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00329}00329         \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z)):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00330}00330             int1[i] = np.matmul(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[3:6,i], np.matmul( Omat[0,i], self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[0:3,i] ) )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00331}00331             int2[i] = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[9,i] * np.matmul( self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[0:3,i], Nmat[0,i] )[0]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00332}00332             int3[i] = -\/1*np.matmul(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[0:3,i], np.matmul( Omat[0,i], self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[3:6,i] ) )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00333}00333             int4[i] = np.matmul(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[0:3,i], Nmat[0,i] * self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[9,i] )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00334}00334             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00335}00335         intVal = np.trapz(int1+int2+int3+int4, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00336}00336         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00337}00337         \textcolor{keywordflow}{return} intVal}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00338}00338         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00339}00339     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00343}\mbox{\hyperlink{class_moments_1_1_moment_solver_a209312167367a05653af1f60365de585}{00343}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a209312167367a05653af1f60365de585}{\_\_Get\_beamridg\_and\_perv}}(self, energy=5e3, current=0.0):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00344}00344         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00345}00345         \textcolor{comment}{\# Parameters}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00346}00346         e         = 1.60217733E-\/19 \textcolor{comment}{\#C}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00347}00347         m         = 9.1093897E-\/31 \textcolor{comment}{\#kg}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00348}00348         Energy    = energy \textcolor{comment}{\# eV}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00349}00349         c         = 2.997924E8 \textcolor{comment}{\# m/s}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00350}00350     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00351}00351         gamma     = 1+((Energy)/(510998.9461));}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00352}00352         beta      = np.sqrt((gamma*gamma)-\/1)/gamma}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00353}00353         v         = beta*c}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00354}00354         bg        = beta*gamma}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00355}00355         rho       = bg*c*(m/e) }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00356}00356         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00357}00357         k\_perv = (1.0/(4.0*np.pi))*(c*377.0*current) / (m*v**3*gamma**3/e);   }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00358}00358         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00359}00359         \textcolor{keywordflow}{return} rho,k\_perv    }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00360}00360     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00361}00361     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00375}\mbox{\hyperlink{class_moments_1_1_moment_solver_aaaf3b24bc45b737ccff3a1389d0ad8ed}{00375}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_aaaf3b24bc45b737ccff3a1389d0ad8ed}{\_\_ode3}}(self, F, h, y0, lattice, verbose=False):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00376}00376         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00377}00377         yout = np.array([]).reshape(len(y0),0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00378}00378         tout = np.array([])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00379}00379         kval = np.array([])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00380}00380         Oval = np.array([], dtype=object).reshape(1,0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00381}00381         Nval = np.array([], dtype=object).reshape(1,0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00382}00382         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00383}00383         \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00384}00384             print(\textcolor{stringliteral}{"{}Integrating elements ... "{}})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00385}00385         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00386}00386         \textcolor{comment}{\# integrate through each element one at a time, making sure to match the initial conditions at the boundary points of elements}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00387}00387         \textcolor{keywordflow}{for} j,elem \textcolor{keywordflow}{in} enumerate(lattice):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00388}00388         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00389}00389             \textcolor{keywordflow}{if} verbose:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00390}00390                 print( str(j+1).zfill(3) + \textcolor{stringliteral}{"{} / "{}} + str(len(lattice[:,0])).zfill(3) )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00391}00391                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00392}00392             \textcolor{comment}{\# start, stop, and k value}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00393}00393             t0 = elem[0]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00394}00394             t1 = elem[1]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00395}00395             k = elem[2]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00396}00396             tsteps = np.arange(t0,t1,h)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00397}00397             tout = np.concatenate((tout,tsteps))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00398}00398             kval = np.concatenate((kval,[k]*len(tsteps)))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00399}00399             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00400}00400             \textcolor{comment}{\# initialize output values for this element}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00401}00401             ytmp = np.zeros((len(y0),len(tsteps)+1)) \textcolor{comment}{\# +1 for initial value}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00402}00402             Otmp = np.empty((1,len(tsteps)), dtype=object)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00403}00403             Ntmp = np.empty((1,len(tsteps)), dtype=object)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00404}00404             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00405}00405             \textcolor{comment}{\# initial conditions are the very last set of points integrated in the previous element (except for the starting element)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00406}00406             ytmp[:,0] = yout[:,-\/1] \textcolor{keywordflow}{if} (j > 0) \textcolor{keywordflow}{else} y0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00407}00407             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00408}00408             \textcolor{comment}{\# run rk3 ode solver algorithm through the element}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00409}00409             y = ytmp[:,0]        }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00410}00410             \textcolor{keywordflow}{for} i,t \textcolor{keywordflow}{in} enumerate(tsteps):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00411}00411                 t1, Otmp[0,i], Ntmp[0,i] = F(t,y,elem[2], elem[3])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00412}00412                 s1 = h*t1}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00413}00413                 t2,\_,\_ = F(t+h/2.0, y+s1/2.0, elem[2], elem[3])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00414}00414                 s2 = h*t2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00415}00415                 t3,\_,\_ = F(t+h, y-\/s1+2.0*s2, elem[2], elem[3])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00416}00416                 s3 = h*t3}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00417}00417                 y = y + (s1 + 4.0*s2 + s3)/6.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00418}00418                 ytmp[:,i+1] = y}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00419}00419                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00420}00420             \textcolor{comment}{\# append to main output before moving onto next element        }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00421}00421             yout = np.concatenate((yout,ytmp),1) \textcolor{keywordflow}{if} (j==0) \textcolor{keywordflow}{else} np.concatenate((yout,ytmp[:,1:]),1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00422}00422             Oval = np.concatenate((Oval,Otmp),axis=1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00423}00423             Nval = np.concatenate((Nval,Ntmp),axis=1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00424}00424         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00425}00425         tout = np.concatenate((tout,np.array([tout[-\/1]+h])))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00426}00426         kval = np.concatenate((kval,np.array([k])))}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00427}00427         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00428}00428         \textcolor{comment}{\# final eval for O matrices}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00429}00429         \_, Otmp, Ntmp = F(tout[-\/1], yout[:,-\/1], lattice[-\/1,2], lattice[-\/1,3])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00430}00430         Otmp2, Ntmp2 = np.empty((1,1),dtype=object), np.empty((1,1),dtype=object)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00431}00431         Otmp2[0,0], Ntmp2[0,0] = Otmp, Ntmp}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00432}00432         Oval = np.concatenate((Oval,Otmp2),axis=1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00433}00433         Nval = np.concatenate((Nval,Ntmp2),axis=1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00434}00434         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00435}00435         \textcolor{keywordflow}{return} tout,yout,kval,Oval,Nval}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00436}00436     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00437}00437     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00445}\mbox{\hyperlink{class_moments_1_1_moment_solver_a8474f9bf5f1cc4acbf0fb415f113e5bd}{00445}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a8474f9bf5f1cc4acbf0fb415f113e5bd}{\_\_ode\_moments}}(self, z, Y, dB, rot):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00446}00446         \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00447}00447 \textcolor{stringliteral}{        Main function that solves Tom's moment equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00448}00448 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00449}00449 \textcolor{stringliteral}{        Y(1) -\/ Q+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00450}00450 \textcolor{stringliteral}{        Y(2) -\/ Q-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00451}00451 \textcolor{stringliteral}{        Y(3) -\/ Qx}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00452}00452 \textcolor{stringliteral}{        Y(4) -\/ P+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00453}00453 \textcolor{stringliteral}{        Y(5) -\/ P-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00454}00454 \textcolor{stringliteral}{        Y(6) -\/ Px}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00455}00455 \textcolor{stringliteral}{        Y(7) -\/ E+}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00456}00456 \textcolor{stringliteral}{        Y(8) -\/ E-\/}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00457}00457 \textcolor{stringliteral}{        Y(9) -\/ Ex}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00458}00458 \textcolor{stringliteral}{        Y(10) -\/ L}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00459}00459 \textcolor{stringliteral}{        Y(11) -\/ phi (solenoid related variable)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00460}00460 \textcolor{stringliteral}{        }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00461}00461 \textcolor{stringliteral}{        '''}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00462}00462 \textcolor{stringliteral}{    }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00463}00463 \textcolor{stringliteral}{        }\textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00464}00464         psi = rot}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00465}00465         k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00466}00466         k\_quad = dB / self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00467}00467                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00468}00468         \textcolor{comment}{\# cq, sq quad calculations         }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00469}00469         cq = np.cos(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00470}00470         sq = np.sin(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00471}00471         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00472}00472         \textcolor{comment}{\# space charge calculation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00473}00473         Q\_delta = np.sqrt( Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 ) \textcolor{keywordflow}{if} Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 > 0 \textcolor{keywordflow}{else} 2**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00474}00474         ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00475}00475         ca\_ab4 = -\/Y[1] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00476}00476         sa\_ab4 = -\/Y[2] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00477}00477         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00478}00478         \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00479}00479         O\_mat,N\_mat = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a06127b2362c3fac711f48dfbbc338941}{\_\_calcON}}\_\_calcON(Y, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00480}00480         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00481}00481         \textcolor{comment}{\# System of 10 equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00482}00482         dydt = np.array([}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00483}00483         \textcolor{comment}{\# dQ/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00484}00484         Y[3],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00485}00485         Y[4],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00486}00486         Y[5],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00487}00487         \textcolor{comment}{\# dP/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00488}00488         Y[6] + np.matmul( O\_mat[0,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00489}00489         Y[7] + np.matmul( O\_mat[1,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00490}00490         Y[8] + np.matmul( O\_mat[2,:], np.reshape(Y[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00491}00491         \textcolor{comment}{\# dE/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00492}00492         np.matmul( O\_mat[0,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[0,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00493}00493         np.matmul( O\_mat[1,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[1,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00494}00494         np.matmul( O\_mat[2,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[2,0]*Y[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00495}00495         \textcolor{comment}{\# dL/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00496}00496         -\/1.0*np.matmul( N\_mat.T, Y[0:3] )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00497}00497         \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00498}00498         -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00499}00499         ])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00500}00500         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00501}00501         \textcolor{keywordflow}{return} dydt, O\_mat, N\_mat    }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00502}00502 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00503}00503     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00512}\mbox{\hyperlink{class_moments_1_1_moment_solver_a5b832ceb0a245d4d449fe18eccee807c}{00512}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a5b832ceb0a245d4d449fe18eccee807c}{\_\_ode\_moments\_adjoint}}(self, z, Yt, dB, rot):  }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00513}00513         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00514}00514         Y = Yt[0:11] \textcolor{comment}{\# adjoint variables}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00515}00515         Y2 = Yt[11:] \textcolor{comment}{\# moment variables}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00516}00516         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00517}00517         \textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00518}00518         psi = rot}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00519}00519         k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00520}00520         k\_quad = dB / self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00521}00521                 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00522}00522         \textcolor{comment}{\# calculations            }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00523}00523         cq = np.cos(2.0*Y2[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00524}00524         sq = np.sin(2.0*Y2[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00525}00525         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00526}00526         \textcolor{comment}{\# space charge stuff}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00527}00527         Q\_delta = np.sqrt( Y2[0]**2 -\/ Y2[1]**2 -\/ Y2[2]**2 ) \textcolor{keywordflow}{if} Y2[0]**2 -\/ Y2[1]**2 -\/ Y2[2]**2 > 0 \textcolor{keywordflow}{else} 2**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00528}00528         ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00529}00529         ca\_ab4 = -\/Y2[1] / ( (Y2[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00530}00530         sa\_ab4 = -\/Y2[2] / ( (Y2[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00531}00531         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00532}00532         \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00533}00533         O\_mat,N\_mat = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a06127b2362c3fac711f48dfbbc338941}{\_\_calcON}}\_\_calcON(Y2, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00534}00534         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00535}00535         \textcolor{comment}{\# Calculate special matrix due to space charge variations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00536}00536         [Mq,Mp,Mn] = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a381bc8a00843b7464e52b500cd0d5943}{\_\_GetSCVM}}\_\_GetSCVM(Y2)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00537}00537         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00538}00538         \textcolor{comment}{\# System of 20 equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00539}00539         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00540}00540         \textcolor{comment}{\# Solve regular envelope equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00541}00541         dydt = np.array([}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00542}00542         \textcolor{comment}{\# dQ/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00543}00543         Y2[3],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00544}00544         Y2[4],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00545}00545         Y2[5],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00546}00546         \textcolor{comment}{\# dP/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00547}00547         Y2[6] + np.matmul( O\_mat[0,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00548}00548         Y2[7] + np.matmul( O\_mat[1,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00549}00549         Y2[8] + np.matmul( O\_mat[2,:], np.reshape(Y2[0:3],(3,1)) )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00550}00550         \textcolor{comment}{\# dE/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00551}00551         np.matmul( O\_mat[0,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[0,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00552}00552         np.matmul( O\_mat[1,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[1,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00553}00553         np.matmul( O\_mat[2,:], np.reshape(Y2[3:6],(3,1)) )[0] + N\_mat[2,0]*Y2[9],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00554}00554         \textcolor{comment}{\# dL/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00555}00555         -\/1.0*np.matmul( N\_mat.T, Y2[0:3] )[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00556}00556         \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00557}00557         -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00558}00558         ])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00559}00559         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00560}00560         \textcolor{comment}{\# dE dot 1 (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00561}00561         dedot1 = np.matmul( np.reshape(Y[3:6], (1,3)), Mq )[0] + \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00562}00562             Y[9]*np.matmul( np.reshape(Y2[0:3], (1,3)), Mn )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00563}00563             np.matmul( np.reshape(Y[0:3], (1,3)), Mp )[0] -\/ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00564}00564             Y2[9]*np.matmul( np.reshape(Y[0:3], (1,3)), Mn )[0] }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00565}00565         \textcolor{comment}{\# dE dot 2 (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00566}00566         dedot2 = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00567}00567         \textcolor{comment}{\# dE dot total (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00568}00568         dedot = dedot1 + dedot2}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00569}00569         \textcolor{comment}{\# dQ dot (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00570}00570         dqdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00571}00571         \textcolor{keywordflow}{if} z == 0.0:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00572}00572             dqdot = np.array([2*Y2[0],0,0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00573}00573         \textcolor{comment}{\# dP dot (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00574}00574         dpdot = np.array([0,0,0])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00575}00575         \textcolor{comment}{\# dL dot (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00576}00576         dldot = 0 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00577}00577         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00578}00578         \textcolor{comment}{\# Solve adjoint equations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00579}00579         dydt2 = np.array([}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00580}00580         \textcolor{comment}{\#dQ/dz (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00581}00581         Y[3] + dqdot[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00582}00582         Y[4] + dqdot[1],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00583}00583         Y[5] + dqdot[2],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00584}00584         \textcolor{comment}{\# dP/dz (y)}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00585}00585         Y[6] + np.matmul( O\_mat[0,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00586}00586         Y[7] + np.matmul( O\_mat[1,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[1],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00587}00587         Y[8] + np.matmul( O\_mat[2,:], np.reshape(Y[0:3],(3,1)) )[0] + dpdot[2],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00588}00588         \textcolor{comment}{\# dE/dz (y) }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00589}00589         np.matmul( O\_mat[0,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[0,0]*Y[9] + dedot[0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00590}00590         np.matmul( O\_mat[1,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[1,0]*Y[9] + dedot[1],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00591}00591         np.matmul( O\_mat[2,:], np.reshape(Y[3:6],(3,1)) )[0] + N\_mat[2,0]*Y[9] + dedot[2],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00592}00592         \textcolor{comment}{\# dL/dz    }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00593}00593         -\/1.0*np.matmul( N\_mat.T, Y[0:3] )[0] + dldot,   }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00594}00594         \textcolor{comment}{\# dphi/dz}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00595}00595         -\/1.0*k\_sol/2.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00596}00596         ])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00597}00597         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00598}00598         \textcolor{keywordflow}{return} np.concatenate((dydt2,dydt)), O\_mat, N\_mat}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00599}00599     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00600}00600     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00603}\mbox{\hyperlink{class_moments_1_1_moment_solver_a06127b2362c3fac711f48dfbbc338941}{00603}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a06127b2362c3fac711f48dfbbc338941}{\_\_calcON}}(self, Y, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4): }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00604}00604         \textcolor{comment}{\# pipe radius calculation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00605}00605         pipe\_constant = (8*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance/self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a7b3bcd33ddc430a8736442255950c319}{pipeRadius}}pipeRadius**4) \textcolor{keywordflow}{if} self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a7b3bcd33ddc430a8736442255950c319}{pipeRadius}}pipeRadius != 0 \textcolor{keywordflow}{else} 0 \textcolor{comment}{\# zero pipe radius leads to infinity}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00606}00606         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00607}00607         \textcolor{comment}{\# O and N matrix calculations}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00608}00608         O\_mat = np.array([[-\/k\_sol**2/2.0 + ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance, 2.0*k\_quad*cq + ca\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance, -\/2.0*k\_quad*sq + sa\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00609}00609             [2.0*k\_quad*cq + ca\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance, -\/k\_sol**2/2.0 + ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance, 0],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00610}00610             [-\/2.0*k\_quad*sq + sa\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance, 0, -\/k\_sol**2/2.0 + ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance]]) + pipe\_constant*np.array([ [0, -\/Y[1], -\/Y[2]],[-\/Y[1], 0, 0],[-\/Y[2], 0, 0] ])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00611}00611     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00612}00612         N\_mat = np.array([[0], [2.0*k\_quad*sq -\/ sa\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance], [2.0*k\_quad*cq + ca\_ab4*self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance]])}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00613}00613         -\/ pipe\_constant*np.array([[0], [-\/Y[2]], [Y[1]]]) \textcolor{comment}{\# pipe radius image forces addition  }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00614}00614         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00615}00615         \textcolor{keywordflow}{return} O\_mat,N\_mat  }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00616}00616     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00617}00617     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00621}\mbox{\hyperlink{class_moments_1_1_moment_solver_a9118d7ab7ea2bf6a0b7f9fe23a32de75}{00621}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a9118d7ab7ea2bf6a0b7f9fe23a32de75}{RecalculateON}}(self):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00622}00622         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00623}00623         \textcolor{comment}{\# initialize new O matrix arrays}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00624}00624         Onew = np.empty((1,len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z)), dtype=object)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00625}00625         Nnew = np.empty((1,len(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z)), dtype=object)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00626}00626 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00627}00627         \textcolor{keywordflow}{for} i, (zi,Y) \textcolor{keywordflow}{in} enumerate(zip(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y.T)):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00628}00628 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00629}00629             \textcolor{comment}{\# find the lattice element we are in}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00630}00630             \textcolor{keywordflow}{for} elem \textcolor{keywordflow}{in} self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a0631c67ede1552b71743b275eb018b51}{lattice}}lattice:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00631}00631                 \textcolor{keywordflow}{if} zi <= elem[1]:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00632}00632                     \textcolor{comment}{\# quads}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00633}00633                     psi = elem[3]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00634}00634                     k\_sol = 0.0}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00635}00635                     k\_quad = elem[2] / self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00636}00636                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00637}00637 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00638}00638             \textcolor{comment}{\# cq, sq quad calculations         }}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00639}00639             cq = np.cos(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00640}00640             sq = np.sin(2.0*Y[10]-\/2.0*psi)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00641}00641             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00642}00642             \textcolor{comment}{\# space charge calculation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00643}00643             Q\_delta = np.sqrt( Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 ) \textcolor{keywordflow}{if} Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 > 0 \textcolor{keywordflow}{else} 2.0**(-\/64.0)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00644}00644             ab4 = 1.0 / Q\_delta; \textcolor{comment}{\# the 4/ab term in equation}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00645}00645             ca\_ab4 = -\/Y[1] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4c\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00646}00646             sa\_ab4 = -\/Y[2] / ( (Y[0]+Q\_delta)*Q\_delta ) \textcolor{comment}{\# 4s\_alpha/ab}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00647}00647             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00648}00648             \textcolor{comment}{\# calculate O,N matrix}}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00649}00649             O\_mat,N\_mat = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a06127b2362c3fac711f48dfbbc338941}{\_\_calcON}}\_\_calcON(Y, k\_sol, k\_quad, cq, sq, ab4, ca\_ab4, sa\_ab4)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00650}00650 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00651}00651             Onew[0,i] = O\_mat}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00652}00652             Nnew[0,i] = N\_mat}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00653}00653             }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00654}00654         \textcolor{keywordflow}{return} Onew, Nnew    }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00655}00655     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00656}00656     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00659}\mbox{\hyperlink{class_moments_1_1_moment_solver_a381bc8a00843b7464e52b500cd0d5943}{00659}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a381bc8a00843b7464e52b500cd0d5943}{\_\_GetSCVM}}(self, Y):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00660}00660         k\_perv = self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a64fd4003461491515c391e77ce73cd64}{perveance}}perveance}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00661}00661         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00662}00662         Q\_delta = np.sqrt( Y[0]**2 -\/ Y[1]**2 -\/ Y[2]**2 )}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00663}00663         Q\_deltaplus = Q\_delta + Y[0]}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00664}00664     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00665}00665         V1 = -\/(k\_perv/(Q\_delta**2))*np.array([Y[3]-\/Y[1]*Y[4]/Q\_deltaplus-\/Y[2]*Y[5]/Q\_deltaplus,}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00666}00666             -\/Y[1]*Y[3]/Q\_deltaplus+Y[4],}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00667}00667             -\/Y[2]*Y[3]/Q\_deltaplus+Y[5]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00668}00668         U1t = (1./Q\_delta)*np.array([Y[0], -\/Y[1], -\/Y[2]]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00669}00669     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00670}00670         V2 = (k\_perv/(Q\_delta*(Q\_deltaplus**2)))*np.array([Y[1]*Y[4]+Y[2]*Y[5],Y[1]*Y[3],Y[2]*Y[3]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00671}00671         U2t = U1t + np.array([1.,0,0]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00672}00672     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00673}00673         V3 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[4], Y[3], 0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00674}00674         V4 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[5], 0, Y[3]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00675}00675         U3t = np.array([0, 1., 0]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00676}00676         U4t = np.array([0,0,1.]).reshape(1,3)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00677}00677     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00678}00678         Mp = V1*U1t + V2*U2t + V3*U3t + V4*U4t}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00679}00679         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00680}00680     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00681}00681         W1 = -\/(k\_perv/Q\_delta)*np.array([1., Y[1]/Q\_deltaplus, Y[2]/Q\_deltaplus]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00682}00682         W2 = (k\_perv/(Q\_delta*(Q\_deltaplus**2)))*np.array([Y[1]**2+Y[2]**2,Y[1]*Y[0],Y[2]*Y[0]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00683}00683         W3 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[1],Y[0],0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00684}00684         W4 = -\/(k\_perv/(Q\_delta*Q\_deltaplus))*np.array([Y[2],0,Y[0]]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00685}00685     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00686}00686         Mq = W1*U1t + W2*U2t + W3*U3t + W4*U4t}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00687}00687         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00688}00688     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00689}00689         X1 = -\/k\_perv*np.array([0, Y[2]/(Q\_deltaplus*(Q\_delta**2)), -\/Y[1]/(Q\_deltaplus*(Q\_delta**2))]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00690}00690         X2 = -\/k\_perv*np.array([0, Y[2]/(Q\_delta*(Q\_deltaplus**2)), -\/Y[1]/(Q\_delta*(Q\_deltaplus**2))]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00691}00691         X3 = k\_perv*np.array([0,0,-\/1./(Q\_delta*Q\_deltaplus)]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00692}00692         X4 = k\_perv*np.array([0,1./(Q\_delta*Q\_deltaplus),0]).reshape(3,1)}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00693}00693     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00694}00694         Mn = X1*U1t + X2*U2t + X3*U3t + X4*U4t}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00695}00695         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00696}00696         \textcolor{keywordflow}{return} Mq,Mp,Mn    }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00697}00697     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00698}00698     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00701}\mbox{\hyperlink{class_moments_1_1_moment_solver_a692d4c6c2e1bdb4265a2f5e32823df6a}{00701}}     \textcolor{keyword}{def }\mbox{\hyperlink{class_moments_1_1_moment_solver_a692d4c6c2e1bdb4265a2f5e32823df6a}{PlotBeamSize}}(self, useAdjointVariables=False):}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00702}00702         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00703}00703         plt.figure()}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00704}00704         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00705}00705         \textcolor{keywordflow}{if} useAdjointVariables:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00706}00706             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{zAdj}}zAdj, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[0,:] + self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[1,:], label=\textcolor{stringliteral}{'x\string^2'})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00707}00707             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{zAdj}}zAdj, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[0,:] -\/ self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ab7f187aff0a8dd9afad13caa89181271}{yAdj}}yAdj[1,:], label=\textcolor{stringliteral}{'y\string^2'})        }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00708}00708             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a17e353fd4fd355de5d1f5b7c5fa78f19}{zAdj}}zAdj, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_aa90dc1afc391920e06d5e66146748a5f}{kAdj}}kAdj / 1e2*1e-\/6*0.2 / self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity, color=\textcolor{stringliteral}{'k'}, label=\textcolor{stringliteral}{'quad strength'})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00709}00709         \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00710}00710             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[0,:] + self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[1,:], label=\textcolor{stringliteral}{'x\string^2'})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00711}00711             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[0,:] -\/ self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a75f8217447462a1e6ee5aedf7b73b04c}{y}}y[1,:], label=\textcolor{stringliteral}{'y\string^2'})        }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00712}00712             plt.plot(self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ae02b30c3060b89fb57a6682a0b7c8f59}{z}}z, self.\mbox{\hyperlink{class_moments_1_1_moment_solver_a97cb0df4d5b1da51bc9d585e05886ef6}{k}}k / 1e2*1e-\/6*0.2 / self.\mbox{\hyperlink{class_moments_1_1_moment_solver_ac541b4b0cec156c2eeff0706a0b6f971}{rigidity}}rigidity, color=\textcolor{stringliteral}{'k'}, label=\textcolor{stringliteral}{'quad strength'})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00713}00713         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00714}00714         plt.grid(\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00715}00715         plt.legend()}
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00716}00716         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00717}00717 }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00718}00718         }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00719}00719     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00720}00720     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00721}00721     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00722}00722     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00723}00723     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00724}00724     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00725}00725     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00726}00726     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00727}00727     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00728}00728     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00729}00729     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00730}00730     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00731}00731     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00732}00732     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00733}00733     }
+\DoxyCodeLine{\Hypertarget{_moments_8py_source_l00734}00734     }
+
+\end{DoxyCode}

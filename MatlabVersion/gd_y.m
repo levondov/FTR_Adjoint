@@ -42,7 +42,6 @@ params_o = [0.213,0.863,-15e-4,... % solenoid start, length, strength
 params_opt = [params_o(1)*a(1),params_o(2),params_o(3)*a(2),params_o(4)*a(3),params_o(5),params_o(6)*a(4),params_o(7)*a(5),params_o(8),...
     params_o(9)*a(6),params_o(10)*a(7),params_o(11),params_o(12)*a(8),params_o(13)*a(9),params_o(14)*a(10),params_o(15)*a(11)];
 
-params_opt'
 % run integration to solve diff eqn.
 h=0.00001; % step size
 z_interval = [0,0.322]; % meters

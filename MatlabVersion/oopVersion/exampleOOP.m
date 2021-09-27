@@ -16,6 +16,7 @@ X0 = [ 0.5*(2.2581^2*1e-6 + 0.2258^2*1e-6)
 % setup moment object
 mom = MomentSolver(5e3, 3.0e-3, X0);
 
+
 % create lattice
 an = ones(9,1);
 mom = CreateLattice(mom, an);

@@ -18,10 +18,10 @@ X0 = [
 % create lattice
 Xn = X0';
 
-periods = 10;
+periods = 1;
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 3.0e-3, X0);
+mom = MomentSolverPeriodic(10e3, 0.0e-3, X0);
 % create lattice
 an = ones(5,1)';
 mom = CreateLattice(mom, an, periods);

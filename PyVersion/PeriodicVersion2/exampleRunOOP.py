@@ -13,6 +13,9 @@ from Moments import MomentSolver
 # create momentSolver objects
 mom = MomentSolver(energy=5e3, current=3.0e-3)
 
+#mom.rigidity = 10
+
+
 if 1:
     ### FTR transformer example ###
     
@@ -22,8 +25,12 @@ if 1:
     qend = [0.01444, 0.13462, 0.2332] # end positions [m]
     quadrot = [0.883077, 0.8406295, 0.8419267] # rotation angle [rad]
     
+    
+    
     # create lattice
     mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.322, repeat=1, verbose=False)
+    
+    
     # run moment solver and grab output
     z,y,motion,k = mom.RunMoments(verbose=True)
     z,y,ym,mot,k = mom.RunMomentsAdjoint(verbose=True)

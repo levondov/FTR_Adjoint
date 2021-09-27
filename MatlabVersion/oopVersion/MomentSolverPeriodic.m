@@ -69,9 +69,18 @@ classdef MomentSolverPeriodic
             
             % setup lattice
             lattice = [];
+            % drift space before first quad
+            lattice(end+1,:) = [zstart, qstart(1), 0.0, 0.0];
             for i = 1:length(dB)
+                % add quad
                 lattice(end+1,:) = [qstart(i), qend(i), dB(i), qrot(i)];
+                % add drift to next quad
+                if (i < length(dB))
+                    lattice(end+1,:) = [qend(i), qstart(i+1), 0.0, 0.0];
+                end
             end
+            % add final drift
+            lattice(end+1,:) = [qend(end), zend, 0.0, 0.0];
             
             % repeating lattice elements
             latticeCopy = lattice;
@@ -96,7 +105,7 @@ classdef MomentSolverPeriodic
             end
             
             %[z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y) obj.odefcn(t,Y), obj.zstart, obj.h, obj.zend, obj.initialMoments, verbose);
-            [z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y) obj.OdeMoments(t,Y), obj.zstart, obj.h, obj.zend, obj.initialMoments, verbose);
+            [z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y,db,rot) obj.OdeMoments(t,Y,db,rot), obj.h, obj.initialMoments, verbose);
             
             obj.z = z;
             obj.y = y;
@@ -115,7 +124,7 @@ classdef MomentSolverPeriodic
             initialMoments = [dQy; dPy; dEy; dLy; 0.0; obj.y(end,:)'];
             
             %[z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y) obj.odefcn(t,Y), obj.zstart, obj.h, obj.zend, obj.initialMoments, verbose);
-            [z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y) obj.OdeMomentsAdjoint(t,Y), obj.zend, -obj.h, obj.zstart, initialMoments, verbose);
+            [z,y,kval,Omat,Nmat] = obj.ode3(@(t,Y,db,rot) obj.OdeMomentsAdjoint(t,Y,db,rot), -obj.h, initialMoments, verbose);
             
             obj.zAdj = flip(z);
             obj.yOri = flip(y(:,12:end),1);
@@ -124,8 +133,8 @@ classdef MomentSolverPeriodic
         end
         
         % ode3 solver
-        function [tout,yout,kval,Omat,Nmat] = ode3(obj, F, t0, h, tfinal, y0, verbose)
-            if nargin == 5
+        function [tout,yout,kval,Omat,Nmat] = ode3(obj, F, h, y0, verbose)
+            if nargin == 3
                 verbose = false;
             end
             
@@ -138,73 +147,104 @@ classdef MomentSolverPeriodic
                 %msg = fprintf(['[',repelem('=',1,0),'>',repelem(' ',1,50),']']);
             end
             
-            tval = t0 : h : tfinal-h;
-            kval = zeros( length(tval)+1,1);
-            Omat = cell( length(tval)+1,1 );
-            Nmat = cell( length(tval)+1,1 );
-            yout = zeros( length(y0), length(tval)+1);
-            y = y0;
-            yout(:,1) = y0;
+            if h > 0
+               intlattice = obj.lattice; 
+            else
+                intlattice = flip(obj.lattice,1);
+                intlattice(:,[1,2]) = flip(intlattice(:,[1,2]),2);
+            end
+            
+            % variables that will be returned at each integration step
+            kval = [];
+            Omat = {};
+            Nmat = {};
+            yout = [];
+            tout = [];
+            
+            [M,N] = size(intlattice);
+
             ii = 1;
             perc = 0; percIncrease = 2;
-            for t = t0 : h : tfinal-h
+            % integrate for each element in the lattice
+            for j = 1:M
                 
                 if verbose
-                    progress = round( 100 * ii / length(tval) );
+                    progress = round( 100 * j / M );
                     if progress >= perc
                         %msg = fprintf(repmat('\b',1,msg));
                         %msg = fprintf(['[',repelem('=',1,progress),'>',repelem(' ',1,50-progress),']']);
                         fprintf(['=']);
                         perc = perc + percIncrease;
                     end
+                end                
+                
+                % start stop strength of element
+                t0 = intlattice(j,1);
+                t1 = intlattice(j,2);
+                tsteps = t0:h:(t1-h);
+                db = intlattice(j,3);
+                rot = intlattice(j,4);
+                
+                tout = [tout, tsteps]; % independent variable
+                kval = [kval, zeros(1,length(tsteps))+db]; % quad strength
+                
+                % output variables for this element
+                ytmp = zeros(length(y0),length(tsteps)+1);
+                Otmp = cell(length(tsteps),1);
+                Ntmp = cell(length(tsteps),1);
+                
+                % initial conditions are the very last set of points integrated in the previous element (except for the starting element)
+                if j == 1
+                    ytmp(:,1) = y0;
+                else
+                    ytmp(:,1) = yout(:,end);
                 end
                 
-                [val,t1,t2,t3] = F(t,y);
-                s1 = h.*val;
-                s2 = h.*F(t+h/2, y+s1./2);
-                s3 = h.*F(t+h, y-s1+2*s2);
-                y = y + (s1 + 4*s2 + s3)./6;
-                yout(:,ii+1) = y;
-                kval(ii) = t1;
-                Omat{ii} = t2;
-                Nmat{ii} = t3;
-                ii = ii + 1;
+                % run rk3 ode solver algorithm through the element
+                y = ytmp(:,1);
+                for jj = 1:length(tsteps)
+                    t = tsteps(jj);
+                    [val,t1,t2,t3] = F(t,y,db,rot);
+                    s1 = h.*val;
+                    s2 = h.*F(t+h/2, y+s1./2, db, rot);
+                    s3 = h.*F(t+h, y-s1+2*s2, db, rot);
+                    y = y + (s1 + 4*s2 + s3)./6;
+                    ytmp(:,jj+1) = y;
+                    
+                    Otmp{jj} = t2;
+                    Ntmp{jj} = t3;                    
+                    ii = ii + 1;
+                end
+                
+                if j == 1
+                    yout = [yout, ytmp];
+                else
+                    yout = [yout, ytmp(:,2:end)];
+                end
+                
+                Omat = [Omat; Otmp];
+                Nmat = [Nmat; Ntmp];
             end
-            fprintf('\n')
             
-            % last point
-            [val,t1,t2,t3] = F(tfinal,y);
-            kval(end) = t1;
-            Omat{end} = t2;
-            Nmat{end} = t3;
+            % final eval
+            tout = [tout, t1];
+            [val,~,t2,t3] = F(t1,yout(:,end),db,rot);
+            Omat = [Omat; t2];
+            Nmat = [Nmat; t3];
+            kval = [kval, db];
             
-            tout = t0 : h : tfinal;
-            yout=yout';
+            tout = tout';
+            yout = yout';
+            kval = kval' / obj.rigidity;
+            fprintf('\n')            
+            
         end
         
         % moment equations being solved for a given z position and list of moments
         % Y = [Q,P,E,L]
         % Y = [Q_plus,Q_minus,Q_x,P_plus,P_minus,P_x,E_plus,E_minus,E_x,L, phi]
         %     [   1       2    3     4       5     6    7      8     9  10 11
-        function [dYdt,k_quad,O_mat,N_mat] = OdeMoments(obj, z, Y)
-            
-            % find out where we are in the lattice
-            % find where we are in lattice
-            db = 0;
-            rot = 0;
-            [N,~] = size(obj.lattice);
-            for i = 1:N
-                if z < obj.lattice(i,1)
-                    break;
-                else
-                    if z <= obj.lattice(i,2)
-                        % inside quad
-                        db = obj.lattice(i,3);
-                        rot = obj.lattice(i,4);
-                        break;
-                    end
-                end
-            end
+        function [dYdt,k_quad,O_mat,N_mat] = OdeMoments(obj, z, Y, db, rot)
             
             k_quad = db / obj.rigidity;
             psi = rot;
@@ -248,27 +288,9 @@ classdef MomentSolverPeriodic
             dYdt = dYdt2;
         end
         
-        function [dYdt,k_quad,O_mat,N_mat] = OdeMomentsAdjoint(obj, z, Yt)
+        function [dYdt,k_quad,O_mat,N_mat] = OdeMomentsAdjoint(obj, z, Yt, db, rot)
             Y = Yt(1:11);
-            Y2 = Yt(12:end);
-            
-            % find out where we are in the lattice
-            % find where we are in lattice
-            db = 0;
-            rot = 0;
-            [N,~] = size(obj.lattice);
-            for i = 1:N
-                if z < obj.lattice(i,1)
-                    break;
-                else
-                    if z <= obj.lattice(i,2)
-                        % inside quad
-                        db = obj.lattice(i,3);
-                        rot = obj.lattice(i,4);
-                        break;
-                    end
-                end
-            end
+            Y2 = Yt(12:end);            
             
             k_quad = db / obj.rigidity;
             psi = rot;

@@ -1,40 +1,25 @@
-% Initial conditions
-X0 = [ 
-    1e-6
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0
-    0.0 ];
 
 % setup moment object
-mom = MomentSolver(10e3, 3.0e-3, X0);
+mom = MomentSolverPeriodic(10e3, 0.0e-3, [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)']);
 
 % create lattice
 an = ones(9,1);
-mom = CreateLattice(mom, an, 1, 1);
+mom = CreateLattice(mom, an, 1);
+mom = mom.RunMoments(true);
 mom.PlotBeamSize();
-title('Pre optimization');
-ylim([-15e-7,15e-7]);
+mom.PlotBeamEmit()
+%ylim([-0.5,4.5]*1e-6);
 
-mom = CreateLattice(mom, an_h(end,:), 1, 1);
+mom = CreateLattice(mom, an, 100);
+mom = mom.RunMoments(true);
 mom.PlotBeamSize();
-title('Post optimization');
-ylim([-15e-7,15e-7]);
+mom.PlotBeamEmit()
+%ylim([-0.5,4.5]*1e-6);
 
+%%
 
-mom = CreateLattice(mom, an, 5, 1);
-mom.PlotBeamSize();
-title('Pre optimization');
-
-mom = CreateLattice(mom, an_h(end,:), 5, 1);
-mom.PlotBeamSize();
-title('Post optimization');
+%X0(7) = (1/16) * ( ex2/(X0(1)+X0(2)) + ey2/(X0(1)-X0(2)) );
+%X0(8) = (1/16) * ( ex2/(X0(1)+X0(2)) - ey2/(X0(1)-X0(2)) ); 
 
 
 

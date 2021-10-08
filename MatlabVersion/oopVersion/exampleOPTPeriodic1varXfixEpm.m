@@ -2,26 +2,25 @@
 verbose = false;
 plotverbose = false;
 
-fixedEpm = false;
-
 % Initial conditions
 X0 = [
    0.001517915861483
   -0.000480068013362
                    0
-   0.006607162641478
-  -0.029336164762942
                    0
-   0.438147365567621
-   0.030973891971892
+                   0
+                   0
                    0
                    0
                    0 ] * 1e-3;
 
+% calculate E+ and E-               
 ex2 = 7.6e-6^2;
 ey2 = 7.6e-6^2;
-%X0(7) = (1/16) * ( ex2/(X0(1)+X0(2)) + ey2/(X0(1)-X0(2)) );
-%X0(8) = (1/16) * ( ex2/(X0(1)+X0(2)) - ey2/(X0(1)-X0(2)) );   
+denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
+numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
+Ep = (numer1 / denom1) + (numer2 / denom2);
+Em = (numer1 / denom1) - (numer2 / denom2); 
 
 % create lattice
 Xn = X0';
@@ -29,7 +28,7 @@ Xn = X0';
 periods = 1;
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 00.0e-3, X0);
+mom = MomentSolverPeriodic(10e3, 0.0e-3, [X0(1:6);Ep;Em;X0(7:end)]);
 % create lattice
 an = ones(5,1)';
 mom = CreateLattice(mom, an, periods);
@@ -59,10 +58,8 @@ df_h =df0;
 
 % adjust starting gamma
 Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
-if fixedEpm
-    Xn_h(end,[7,8]) = X0([7,8]);
-end
-mom.initialMoments = Xn_h(end,:)';
+
+mom.initialMoments = [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)'];
 mom = mom.RunMoments(verbose);
 
 [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1(); % get FoM
@@ -72,10 +69,8 @@ while f_h(end) >= f0
     gamma_h(end+1) = gamma_h(end)/2.0;
     
     Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
-    if fixedEpm
-        Xn_h(end,[7,8]) = X0([7,8]);
-    end
-    mom.initialMoments = Xn_h(end,:)';
+
+    mom.initialMoments = [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)'];
     mom = mom.RunMoments(verbose);
     
     [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1(); % get FoM
@@ -112,10 +107,8 @@ while 1
         
         % iterate
         Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
-        if fixedEpm
-            Xn_h(end,[7,8]) = X0([7,8]);
-        end
-        mom.initialMoments = Xn_h(end,:)';
+
+        mom.initialMoments = [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)'];
         mom = mom.RunMoments(verbose);
         
         % compute fom
@@ -133,14 +126,11 @@ while 1
     
     % grab last good settings
     Xn_h(end+1,:) = Xn_h(end-1,:);
-    if fixedEpm
-        Xn_h(end,[7,8]) = X0([7,8]);
-    end
     f_h(end+1) = f_h(end-1);
     fp_h(end+1,:) = fp_h(end-1,:);
     
     % calc adjoint equations
-    mom.initialMoments = Xn_h(end,:)';
+    mom.initialMoments = [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)'];
     mom = mom.RunMoments(verbose);
     mom = mom.RunMomentsAdjoint(verbose);
     
@@ -157,10 +147,8 @@ while 1
             gamma_h(end+1) = gamma_h(end)/2.0;
             
             Xn_h(end+1,:) = Xnn - gamma_h(end)*df_h(:,end)'; % iterate
-            if fixedEpm
-                Xn_h(end,[7,8]) = X0([7,8]);
-            end
-            mom.initialMoments = Xn_h(end,:)';
+
+            mom.initialMoments = [Xn_h(end,1:6)';Ep;Em;Xn_h(end,7:end)'];
             mom = mom.RunMoments(verbose);
             
             [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1(); % get FoM

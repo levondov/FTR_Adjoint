@@ -3,3 +3,4 @@ PyVersion/data/
 PyVersion/PeriodicVersion/Data/
 *.pyc
 *.asv
+*.mat

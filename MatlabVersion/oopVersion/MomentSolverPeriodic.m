@@ -24,6 +24,7 @@ classdef MomentSolverPeriodic
         z
         y
         k
+        com
         yOri
         yAdj
         zAdj
@@ -70,7 +71,10 @@ classdef MomentSolverPeriodic
             % setup lattice
             lattice = [];
             % drift space before first quad
-            lattice(end+1,:) = [zstart, qstart(1), 0.0, 0.0];
+            if ( (qstart(1) - zstart) > 0 )
+                lattice(end+1,:) = [zstart, qstart(1), 0.0, 0.0];
+            end
+            
             for i = 1:length(dB)
                 % add quad
                 lattice(end+1,:) = [qstart(i), qend(i), dB(i), qrot(i)];
@@ -80,7 +84,9 @@ classdef MomentSolverPeriodic
                 end
             end
             % add final drift
-            lattice(end+1,:) = [qend(end), zend, 0.0, 0.0];
+            if ( (zend - qend(end)) > 0 )
+                lattice(end+1,:) = [qend(end), zend, 0.0, 0.0];
+            end
             
             % repeating lattice elements
             latticeCopy = lattice;
@@ -112,6 +118,13 @@ classdef MomentSolverPeriodic
             obj.k = kval;
             obj.Omat = Omat;
             obj.Nmat = Nmat;
+            
+            % Constant of Motion 1% 0.5*Tr(J_4^2 sigma^2)
+            L = [y(:,10)];
+            EQ = y(:,7).*y(:,1) + y(:,8).*y(:,2) + y(:,9).*y(:,3);
+            PP = y(:,4).^2 + y(:,5).^2 + y(:,6).^2;
+            motion1 = EQ + (1/2)*L.^2 - (1/2)*PP;            
+            obj.com = motion1;
         end
         
         function obj = RunMomentsAdjoint(obj, verbose)
@@ -148,7 +161,7 @@ classdef MomentSolverPeriodic
             end
             
             if h > 0
-               intlattice = obj.lattice; 
+                intlattice = obj.lattice;
             else
                 intlattice = flip(obj.lattice,1);
                 intlattice(:,[1,2]) = flip(intlattice(:,[1,2]),2);
@@ -162,7 +175,7 @@ classdef MomentSolverPeriodic
             tout = [];
             
             [M,N] = size(intlattice);
-
+            
             ii = 1;
             perc = 0; percIncrease = 2;
             % integrate for each element in the lattice
@@ -176,7 +189,7 @@ classdef MomentSolverPeriodic
                         fprintf(['=']);
                         perc = perc + percIncrease;
                     end
-                end                
+                end
                 
                 % start stop strength of element
                 t0 = intlattice(j,1);
@@ -204,7 +217,7 @@ classdef MomentSolverPeriodic
                 y = ytmp(:,1);
                 for jj = 1:length(tsteps)
                     t = tsteps(jj);
-                    [val,t1,t2,t3] = F(t,y,db,rot);
+                    [val,~,t2,t3] = F(t,y,db,rot);
                     s1 = h.*val;
                     s2 = h.*F(t+h/2, y+s1./2, db, rot);
                     s3 = h.*F(t+h, y-s1+2*s2, db, rot);
@@ -212,7 +225,7 @@ classdef MomentSolverPeriodic
                     ytmp(:,jj+1) = y;
                     
                     Otmp{jj} = t2;
-                    Ntmp{jj} = t3;                    
+                    Ntmp{jj} = t3;
                     ii = ii + 1;
                 end
                 
@@ -236,7 +249,7 @@ classdef MomentSolverPeriodic
             tout = tout';
             yout = yout';
             kval = kval' / obj.rigidity;
-            fprintf('\n')            
+            fprintf('\n')
             
         end
         
@@ -290,7 +303,7 @@ classdef MomentSolverPeriodic
         
         function [dYdt,k_quad,O_mat,N_mat] = OdeMomentsAdjoint(obj, z, Yt, db, rot)
             Y = Yt(1:11);
-            Y2 = Yt(12:end);            
+            Y2 = Yt(12:end);
             
             k_quad = db / obj.rigidity;
             psi = rot;
@@ -516,6 +529,10 @@ classdef MomentSolverPeriodic
             y = obj.y;
             k0 = obj.k0;
             
+            % match location
+            mloc = (length(obj.z));
+            mloc2 = (length(obj.z)-1)/2.0;
+            
             % calculate adjoint related variables
             dPy = zeros(3,1); gPy = dPy;
             dEy = zeros(3,1); gEy = dEy;
@@ -523,19 +540,19 @@ classdef MomentSolverPeriodic
             dLy = zeros(1,1); gLy = dLy;
             
             % figure of merit periodic
-            FoM1 = 0.5 * k0^2 * sum((y(end,1:3) - y(1,1:3)).^2);
-            FoM2 = 0.5 * sum((y(end,4:6) - y(1,4:6)).^2);
-            FoM3 = 0.5 * k0^(-2) * sum((y(end,7:9) - y(1,7:9)).^2);
-            FoM4 = 0.5 * sum((y(end,10) - y(1,10)).^2);
+            FoM1 = 0.5 * k0^2 * sum((y(mloc,1:3) - y(1,1:3)).^2);
+            FoM2 = 0.5 * sum((y(mloc,4:6) - y(1,4:6)).^2);
+            FoM3 = 0.5 * k0^(-2) * sum((y(mloc,7:9) - y(1,7:9)).^2);
+            FoM4 = 0.5 * sum((y(mloc,10) - y(1,10)).^2);
             
             % dF/dQ
-            gQy(1:3) = k0^2 * (y(end,1:3) - y(1,1:3));
+            gQy(1:3) = k0^2 * (y(mloc,1:3) - y(1,1:3));
             % dF/dP
-            gPy(1:3) = (y(end,4:6) - y(1,4:6));
+            gPy(1:3) = (y(mloc,4:6) - y(1,4:6));
             % dF/dE
-            gEy(1:3) = k0^(-2) * (y(end,7:9) - y(1,7:9));
+            gEy(1:3) = k0^(-2) * (y(mloc,7:9) - y(1,7:9));
             % dF/dL
-            gLy(1)   = (y(end,10) - y(1,10));
+            gLy(1)   = (y(mloc,10) - y(1,10));
             
             dQy = - gEy;
             dPy =   gPy;
@@ -549,19 +566,35 @@ classdef MomentSolverPeriodic
         
         function [df] = CalcFoMGradientX(obj)
             
-            df = zeros(11,1);
-            k0 = obj.k0;
-            
-            % Q
-            df(1:3) = -k0^(-1) * (obj.yAdj(1,7:9) - obj.yAdj(end,7:9));
-            % P
-            df(4:6) = (obj.yAdj(1,4:6) - obj.yAdj(end,4:6));
-            % E
-            df(7:9) = -k0 * (obj.yAdj(1,1:3) - obj.yAdj(end,1:3));
-            % L
-            df(10) = -(obj.yAdj(1,10) - obj.yAdj(end,10));
-            % phi
-            df(11) = 0.0; % solenoid phi larmor angle
+            if 0
+                df = zeros(11,1);
+                k0 = obj.k0;
+                
+                % Q
+                df(1:3) = -k0^(-1) * (obj.yAdj(1,7:9) - obj.yAdj(end,7:9));
+                % P
+                df(4:6) = (obj.yAdj(1,4:6) - obj.yAdj(end,4:6));
+                % E
+                df(7:9) = -k0 * (obj.yAdj(1,1:3) - obj.yAdj(end,1:3));
+                % L
+                df(10) = -(obj.yAdj(1,10) - obj.yAdj(end,10));
+                % phi
+                df(11) = 0.0; % solenoid phi larmor angle
+            else
+                df = zeros(9,1);
+                k0 = obj.k0;
+                
+                % Q
+                df(1:3) = -k0^(-1) * (obj.yAdj(1,7:9) - obj.yAdj(end,7:9));
+                % P
+                df(4:6) = (obj.yAdj(1,4:6) - obj.yAdj(end,4:6));
+                % E
+                df(7) = -k0 * (obj.yAdj(1,3) - obj.yAdj(end,3));
+                % L
+                df(8) = -(obj.yAdj(1,10) - obj.yAdj(end,10));
+                % phi
+                df(9) = 0.0; % solenoid phi larmor angle
+            end
             
         end
         
@@ -571,11 +604,30 @@ classdef MomentSolverPeriodic
             plot(obj.z,obj.y(:,1)+obj.y(:,2));
             plot(obj.z,obj.y(:,1)-obj.y(:,2));
             
-            plot(obj.z,obj.k/1e2*1e-6*0.2,'k-','Linewidth',1);
+            kquad = obj.k / max(obj.k);
+            kquad = kquad * max(obj.y(:,1)) * 0.10;
+            plot(obj.z,kquad,'k-','Linewidth',1);
             
-            xlabel('Z position (m)'); ylabel('Moments [m^2]'); title('Beam size through FTR transformer');
+            xlabel('Z position (m)'); ylabel('Moments [m^2]'); title('Beam size through lattice');
             legend('\langle x^2 \rangle','\langle y^2 \rangle','K_{quad}','Location','northeastoutside');
             grid on;
+        end
+        
+        function PlotBeamEmit(obj)
+            ex = ( 0.5*(obj.y(:,7)+obj.y(:,8)) .* (obj.y(:,1)+obj.y(:,2)) - 0.5*(obj.y(:,4)+obj.y(:,5)).^2 );
+            ey = ( 0.5*(obj.y(:,7)-obj.y(:,8)) .* (obj.y(:,1)-obj.y(:,2)) - 0.5*(obj.y(:,4)-obj.y(:,5)).^2 );
+            
+            figure; hold on;
+            plot(obj.z,ex);
+            plot(obj.z,ey);
+            
+            kquad = obj.k / max(obj.k);
+            kquad = kquad * max(ex) * 0.10;
+            plot(obj.z,kquad,'k-','Linewidth',1);
+            
+            xlabel('Z position (m)'); ylabel('Emittance [m*rad]'); title('Beam emittance through lattice');
+            legend('\epsilon_x^2','\epsilon_y^2','K_{quad}','Location','northeastoutside');
+            grid on;            
         end
         
     end

@@ -1,6 +1,6 @@
 
 verbose = false;
-plotverbose = true;
+plotverbose = false;
 % Initial conditions
 X0 = [ 
     1e-6
@@ -21,7 +21,7 @@ an = ones(5,1)';
 periods = 1;
 
 % setup moment object
-mom = MomentSolverPeriodic(5e3, 3.0e-3, X0);
+mom = MomentSolverPeriodic(5e3, 0.0e-3, X0);
 % create lattice
 mom = CreateLattice(mom, an, periods);
 

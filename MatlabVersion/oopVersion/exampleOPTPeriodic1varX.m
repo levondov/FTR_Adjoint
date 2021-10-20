@@ -2,26 +2,31 @@
 verbose = false;
 plotverbose = false;
 
-fixedEpm = false;
+fixedEpm = true;
 
 % Initial conditions
 X0 = [
-   0.001517915861483
-  -0.000480068013362
+   0.001252188797105
+  -0.000682443064303
                    0
-   0.006607162641478
-  -0.029336164762942
+   0.000000000264310
+   0.000000000088867
                    0
-   0.438147365567621
-   0.030973891971892
+   0.131234365905479
+   0.071522747222643
                    0
                    0
                    0 ] * 1e-3;
 
+% calculate E+ and E-
 ex2 = 7.6e-6^2;
 ey2 = 7.6e-6^2;
-%X0(7) = (1/16) * ( ex2/(X0(1)+X0(2)) + ey2/(X0(1)-X0(2)) );
-%X0(8) = (1/16) * ( ex2/(X0(1)+X0(2)) - ey2/(X0(1)-X0(2)) );   
+denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
+numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
+Ep = (numer1 / denom1) + (numer2 / denom2);
+Em = (numer1 / denom1) - (numer2 / denom2);
+X0(7) = Ep;
+X0(8) = Em;
 
 % create lattice
 Xn = X0';
@@ -29,7 +34,7 @@ Xn = X0';
 periods = 1;
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 00.0e-3, X0);
+mom = MomentSolverPeriodic(10e3, 20.0e-3, X0);
 % create lattice
 an = ones(5,1)';
 mom = CreateLattice(mom, an, periods);
@@ -60,7 +65,12 @@ df_h =df0;
 % adjust starting gamma
 Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
 if fixedEpm
-    Xn_h(end,[7,8]) = X0([7,8]);
+    denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
+    numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
+    Ep = (numer1 / denom1) + (numer2 / denom2);
+    Em = (numer1 / denom1) - (numer2 / denom2);
+    Xn_h(end,7) = Ep;
+    Xn_h(end,8) = Em;
 end
 mom.initialMoments = Xn_h(end,:)';
 mom = mom.RunMoments(verbose);
@@ -73,7 +83,12 @@ while f_h(end) >= f0
     
     Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
     if fixedEpm
-        Xn_h(end,[7,8]) = X0([7,8]);
+        denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
+        numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
+        Ep = (numer1 / denom1) + (numer2 / denom2);
+        Em = (numer1 / denom1) - (numer2 / denom2);
+        Xn_h(end,7) = Ep;
+        Xn_h(end,8) = Em;
     end
     mom.initialMoments = Xn_h(end,:)';
     mom = mom.RunMoments(verbose);
@@ -113,7 +128,12 @@ while 1
         % iterate
         Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
         if fixedEpm
-            Xn_h(end,[7,8]) = X0([7,8]);
+            denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
+            numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
+            Ep = (numer1 / denom1) + (numer2 / denom2);
+            Em = (numer1 / denom1) - (numer2 / denom2);
+            Xn_h(end,7) = Ep;
+            Xn_h(end,8) = Em;
         end
         mom.initialMoments = Xn_h(end,:)';
         mom = mom.RunMoments(verbose);
@@ -134,7 +154,12 @@ while 1
     % grab last good settings
     Xn_h(end+1,:) = Xn_h(end-1,:);
     if fixedEpm
-        Xn_h(end,[7,8]) = X0([7,8]);
+        denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
+        numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
+        Ep = (numer1 / denom1) + (numer2 / denom2);
+        Em = (numer1 / denom1) - (numer2 / denom2);
+        Xn_h(end,7) = Ep;
+        Xn_h(end,8) = Em;
     end
     f_h(end+1) = f_h(end-1);
     fp_h(end+1,:) = fp_h(end-1,:);
@@ -158,7 +183,12 @@ while 1
             
             Xn_h(end+1,:) = Xnn - gamma_h(end)*df_h(:,end)'; % iterate
             if fixedEpm
-                Xn_h(end,[7,8]) = X0([7,8]);
+                denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
+                numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
+                Ep = (numer1 / denom1) + (numer2 / denom2);
+                Em = (numer1 / denom1) - (numer2 / denom2);
+                Xn_h(end,7) = Ep;
+                Xn_h(end,8) = Em;
             end
             mom.initialMoments = Xn_h(end,:)';
             mom = mom.RunMoments(verbose);

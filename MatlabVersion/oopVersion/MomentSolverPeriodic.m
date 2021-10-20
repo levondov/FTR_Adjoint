@@ -566,7 +566,7 @@ classdef MomentSolverPeriodic
         
         function [df] = CalcFoMGradientX(obj)
             
-            if 0
+            if 1
                 df = zeros(11,1);
                 k0 = obj.k0;
                 

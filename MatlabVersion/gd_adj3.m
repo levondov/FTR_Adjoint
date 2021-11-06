@@ -8,7 +8,7 @@
 global k_perv k0 hardedge_flag e1 e2
 k_perv = c2perv(3.0e-3);
 k0 = 7;
-e1 = 0.0;
+e1 = 1.0;
 e2 = 1.0;
 hardedge_flag = 1;
 flag_noangle = 0;

@@ -44,7 +44,7 @@ params_opt = [params_o(1)*a(1),params_o(2),params_o(3)*a(2),params_o(4)*a(3),par
 
 % run integration to solve diff eqn.
 h=0.00001; % step size
-z_interval = [0,0.322]; % meters
+z_interval = [0,1.322]; % meters
 z = z_interval(1):h:z_interval(2);
 [y] = ode3(@(t,Y) odefcn(t,Y,params_opt), z_interval(1), h, z_interval(2), init_cond);
 

@@ -2,18 +2,18 @@
 verbose = false;
 plotverbose = false;
 
-fixedEpm = true;
+fixedEpm = false;
 
 % Initial conditions
 X0 = [
-   0.001252188806995
-  -0.000682443113451
+   0.001306266362858
+  -0.000681110843097
                    0
-   0.000000000361770
-   0.000000000548486
+   0.000082600114162
+   0.000160506016655
                    0
-   0.131234371979704
-   0.071522755119089
+   0.121505236229312
+   0.063375320588014
                    0
                    0
                    0 ] * 1e-3;
@@ -35,7 +35,7 @@ turns = 1;
 numEvenCells = 5;
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 1.0e-3, X0);
+mom = MomentSolverPeriodic(10e3, 82.5e-3, X0);
 % create lattice
 an = ones(5,1)';
 mom = CreateLatticeAperiodic(mom, an, turns, numEvenCells);

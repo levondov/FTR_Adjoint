@@ -3,42 +3,43 @@ verbose = false;
 plotverbose = false;
 
 fixedEpm = false;
+useJvar = true;
 
 % Initial conditions
 X0 = [
-   0.001306266362858
-  -0.000681110843097
-                   0
-   0.000082600114162
-   0.000160506016655
-                   0
-   0.121505236229312
-   0.063375320588014
-                   0
-                   0
-                   0 ] * 1e-3;
+    0.001306266362858
+    -0.000681110843097
+    0
+    0.000082600114162
+    0.000160506016655
+    0
+    0.121505236229312
+    0.063375320588014
+    0
+    0
+    0 ] * 1e-3;
 
 % calculate E+ and E-
-ex2 = 7.6e-6^2;
-ey2 = 7.6e-6^2;
+ex2 = 7.0e-6^2;
+ey2 = 7.0e-6^2;
 denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
 numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
-Ep = (numer1 / denom1) + (numer2 / denom2);
-Em = (numer1 / denom1) - (numer2 / denom2);
+Ep = 0.5*((numer1 / denom1) + (numer2 / denom2));
+Em = 0.5*((numer1 / denom1) - (numer2 / denom2));
 X0(7) = Ep;
 X0(8) = Em;
 
 % create lattice
 Xn = X0';
 
-turns = 1;
+turns = 3;
 numEvenCells = 5;
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 10e-3, X0);
+mom = MomentSolverPeriodic(10e3, 0.0, X0);
 % create lattice
 an = ones(5,1)';
-mom = CreateLatticeAperiodic(mom, an, turns, numEvenCells);
+mom = CreateLattice(mom, an, turns, 0);
 
 % run moment + adjoint equations
 mom = mom.RunMoments(verbose);
@@ -52,6 +53,7 @@ mom.PlotBeamSize();
 
 % gradient
 df0 = mom.CalcFoMGradientX();
+dj0 = mom.CalcFoMGradientJ();
 
 % gradient descent parameter
 gamma = (f0/sum(df0.^2));
@@ -61,10 +63,15 @@ gamma_h = gamma;
 Xn_h = Xn;
 f_h = f0;
 fp_h = f0p;
-df_h =df0;
+df_h = df0;
+dj_h = {dj0};
 
 % adjust starting gamma
-Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
+if useJvar
+    Xn_h(end+1,:) = Xn - gamma_h(end)*df0' + gamma_h(end)*calcJcomponent(dj0, df0)'; % iterate
+else
+    Xn_h(end+1,:) = Xn - gamma_h(end)*df0';
+end
 if fixedEpm
     denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
     numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
@@ -81,8 +88,11 @@ mom = mom.RunMoments(verbose);
 fprintf(['FoM: ',num2str(f_h(end)),'\n']);
 while f_h(end) >= f0
     gamma_h(end+1) = gamma_h(end)/2.0;
-    
-    Xn_h(end+1,:) = Xn - gamma_h(end)*df0'; % iterate
+    if useJvar
+        Xn_h(end+1,:) = Xn - gamma_h(end)*df0' + gamma_h(end)*calcJcomponent(dj0, df0)'; % iterate
+    else
+        Xn_h(end+1,:) = Xn - gamma_h(end)*df0';
+    end
     if fixedEpm
         denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
         numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
@@ -127,7 +137,11 @@ while 1
         fprintf(['Iterating ',num2str(ii),'\n']);
         
         % iterate
-        Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+        if useJvar
+            Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)' + gamma_h(end)*calcJcomponent(dj_h{end}, df_h(:,end))';
+        else
+            Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+        end
         if fixedEpm
             denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
             numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
@@ -173,6 +187,10 @@ while 1
     % calc new gradient and gamma
     df = mom.CalcFoMGradientX();
     df_h(:,end+1) = df;
+    if useJvar
+        dj = mom.CalcFoMGradientJ();
+        dj_h{end+1} = dj;
+    end
     
     if (ii == 2) % meaning no improving from recalculating gradient.
         % change gamma
@@ -181,8 +199,11 @@ while 1
         
         while f_h(end) >= f0n
             gamma_h(end+1) = gamma_h(end)/2.0;
-            
-            Xn_h(end+1,:) = Xnn - gamma_h(end)*df_h(:,end)'; % iterate
+            if useJvar
+                Xn_h(end+1,:) = Xnn - gamma_h(end)*df_h(:,end)' + gamma_h(end)*calcJcomponent(dj_h{end}, df_h(:,end))'; % iterate
+            else
+                Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+            end
             if fixedEpm
                 denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
                 numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
@@ -211,4 +232,45 @@ while 1
     end
     
 end
+
+
+
+
+
+
+function [dX] = calcJcomponent(djs, dw)
+[~,N] = size(djs);
+
+% calculate M matrix
+M = zeros(N,N);
+for i = 1:N
+    for j = 1:N
+        M(i,j) = dot(djs(:,i),djs(:,j));
+    end
+end
+% inverse it
+M = inv(M);
+
+tmpipiece = zeros(11,1);
+for i = 1:N % for each Ji        
+    tmpjpiece = 0;
+    for j = 1:N % for each Jj
+        tmpjpiece = tmpjpiece + M(i,j) * ( dot(djs(:,j),dw) );
+    end
+    tmpipiece = tmpipiece + djs(:,i) * tmpjpiece;
+end
+
+dX = tmpipiece;
+
+end
+
+
+
+
+
+
+
+
+
+
 

@@ -17,7 +17,7 @@ classdef MomentSolverPeriodic
         zend
         
         % integration variables
-        h = 0.0001% step size
+        h = 10000; % step size
         
         % Moment variables
         initialMoments
@@ -194,7 +194,13 @@ classdef MomentSolverPeriodic
                 % start stop strength of element
                 t0 = intlattice(j,1);
                 t1 = intlattice(j,2);
-                tsteps = t0:h:(t1-h);
+                if ( h > 0 )
+                    tsteps = linspace(t0,t1,h); %t0:h:(t1-h);
+                else
+                   tsteps = linspace(t1,t0,abs(h)); 
+                end
+                tsteps = tsteps(1:end-1);
+                stepSize = abs(tsteps(2) - tsteps(1));
                 db = intlattice(j,3);
                 rot = intlattice(j,4);
                 
@@ -218,9 +224,9 @@ classdef MomentSolverPeriodic
                 for jj = 1:length(tsteps)
                     t = tsteps(jj);
                     [val,~,t2,t3] = F(t,y,db,rot);
-                    s1 = h.*val;
-                    s2 = h.*F(t+h/2, y+s1./2, db, rot);
-                    s3 = h.*F(t+h, y-s1+2*s2, db, rot);
+                    s1 = stepSize.*val;
+                    s2 = stepSize.*F(t+stepSize/2, y+s1./2, db, rot);
+                    s3 = stepSize.*F(t+stepSize, y-s1+2*s2, db, rot);
                     y = y + (s1 + 4*s2 + s3)./6;
                     ytmp(:,jj+1) = y;
                     
@@ -598,6 +604,63 @@ classdef MomentSolverPeriodic
             
         end
         
+        function [djs] = CalcFoMGradientJ(obj)
+            idx = 1;
+            % j terms term
+            % ex2
+            j1 = (obj.y(idx,7)+obj.y(idx,8)) .* (obj.y(idx,1)+obj.y(idx,2)) - 0.5*(obj.y(idx,4)+obj.y(idx,5)).^2;
+            dj1 = zeros(11,1);         
+            dj1(1) = (obj.y(idx,7)+obj.y(idx,8));
+            dj1(2) = (obj.y(idx,7)+obj.y(idx,8));
+            dj1(3) = 0.0;
+            dj1(4) = -(obj.y(idx,4)+obj.y(idx,5));
+            dj1(5) = -(obj.y(idx,4)+obj.y(idx,5));
+            dj1(6) = 0.0;
+            dj1(7) = (obj.y(idx,1)+obj.y(idx,2));
+            dj1(8) = (obj.y(idx,1)+obj.y(idx,2));
+            dj1(9) = 0.0;
+            dj1(10) = 0.0;
+            dj1(11) = 0.0;
+            % ey2
+            j2 = (obj.y(idx,7)-obj.y(idx,8)) .* (obj.y(idx,1)-obj.y(idx,2)) - 0.5*(obj.y(idx,4)-obj.y(idx,5)).^2;
+            dj2 = zeros(11,1);             
+            dj2(1) = (obj.y(idx,7)-obj.y(idx,8));
+            dj2(2) = -(obj.y(idx,7)-obj.y(idx,8));
+            dj2(3) = 0.0;
+            dj2(4) = -(obj.y(idx,4)-obj.y(idx,5));
+            dj2(5) = (obj.y(idx,4)-obj.y(idx,5));
+            dj2(6) = 0.0;
+            dj2(7) = (obj.y(idx,1)-obj.y(idx,2));
+            dj2(8) = -(obj.y(idx,1)-obj.y(idx,2));
+            dj2(9) = 0.0;
+            dj2(10) = 0.0;
+            dj2(11) = 0.0;            
+            % com
+            dj3 = zeros(11,1);
+            % Q
+            dj3(1) = obj.y(idx,7);
+            dj3(2) = obj.y(idx,8);
+            dj3(3) = obj.y(idx,9);
+            % P
+            dj3(4) = -obj.y(idx,4);
+            dj3(5) = -obj.y(idx,5);
+            dj3(6) = -obj.y(idx,6);
+            % E
+            dj3(7) = obj.y(idx,1);
+            dj3(8) = obj.y(idx,2);
+            dj3(9) = obj.y(idx,3);
+            % L
+            dj3(10) = obj.y(idx,10);
+            % phi
+            dj3(11) = 0; % solenoid phi larmor angle                
+            
+            djs = zeros(11,2);
+            djs(:,1) = dj1;
+            djs(:,2) = dj2;
+            %djs(:,3) = dj3;
+            
+        end        
+        
         function PlotBeamSize(obj)
             
             figure; hold on;
@@ -614,8 +677,8 @@ classdef MomentSolverPeriodic
         end
         
         function PlotBeamEmit(obj)
-            ex = ( 0.5*(obj.y(:,7)+obj.y(:,8)) .* (obj.y(:,1)+obj.y(:,2)) - 0.5*(obj.y(:,4)+obj.y(:,5)).^2 );
-            ey = ( 0.5*(obj.y(:,7)-obj.y(:,8)) .* (obj.y(:,1)-obj.y(:,2)) - 0.5*(obj.y(:,4)-obj.y(:,5)).^2 );
+            ex = ( (obj.y(:,7)+obj.y(:,8)) .* (obj.y(:,1)+obj.y(:,2)) - 0.5*(obj.y(:,4)+obj.y(:,5)).^2 );
+            ey = ( (obj.y(:,7)-obj.y(:,8)) .* (obj.y(:,1)-obj.y(:,2)) - 0.5*(obj.y(:,4)-obj.y(:,5)).^2 );
             
             figure; hold on;
             plot(obj.z,ex);

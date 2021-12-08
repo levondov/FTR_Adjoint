@@ -16,7 +16,7 @@ mom = MomentSolver(energy=5e3, current=3.0e-3)
 #mom.rigidity = 10
 
 
-if 1:
+if 0:
     ### FTR transformer example ###
     
     # define a quadrupole lattice
@@ -51,27 +51,43 @@ if 0:
     mom.PlotBeamSize()
 
 
-if 0:
+if 1:
     ### Periodic 2
     
     # define a quadrupole lattice
-    dB = [0.02661, -0.02661, 0.02661] # gradients [T/m]
-    qstart = [0.0, 0.052125, 0.131375] # start positions [m]
-    qend = [0.027125, 0.106375, 0.1585] # end positions [m]
+    qlength = 0.02
+    dB = [0.15, -0.15, 0.15] # gradients [T/m]
+    qstart = [0.0, 0.03, 0.07] # start positions [m]
+    qend = [qstart[0]+qlength/2.0, qstart[1]+qlength, qstart[2]+qlength/2.0] # end positions [m]
     quadrot = [0.0, 0.0, 0.0] # rotation angle [rad]
     
     # create lattice
-    mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.1585, repeat=4, verbose=True)
+    mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.08, repeat=20, verbose=True)
     # adjust beam properties
     mom.energy = 10e3
-    mom.current = 0.67e-3
-    mom.initialConditions = [1e-6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    mom.h = 0.0001
+    mom.current = 0.0
+    mom.initialConditions = [
+       0.005305303507350*1e-4,
+      -0.000704766300903*1e-4,
+      -0.000003802517788*1e-4,
+      -0.000013223559645*1e-4,
+       0.000005829207635*1e-4,
+      -0.000010686777115*1e-4,
+       0.138523562476793*1e-4,
+       0.018317745992450*1e-4,
+       0.000011963896800*1e-4,
+      -0.000003463399474*1e-4,
+      0.0
+     ]
+    mom.h = 100
     mom.CalculateBeamProperties()
     # run moment solver and grab output
     z,y,motion,k = mom.RunMoments(verbose=True)
     # plot beam size moments
-    mom.PlotBeamSize()
+    mom.PlotBeamSize(scale=0.2)
+    
+    import scipy.io as sio
+    sio.savemat('run1py.mat',{'data': [mom.z,mom.y]})
 
 
 

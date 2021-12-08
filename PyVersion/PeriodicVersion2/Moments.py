@@ -45,9 +45,9 @@ class MomentSolver:
         self.zend = None
         
         ## integration step size
-        self.h = 0.0001
+        self.h = 100
         ## reversed integration step size
-        self.hReversed = -0.0001
+        self.hReversed = 100
         
         ## z position of the moment solution
         self.z = None
@@ -362,7 +362,7 @@ class MomentSolver:
     # This functions goes through each element and integrates the moment equations through a given quadrupole field profile
     #
     # @param[in] F Reference to the function being solved, in this case __ode_moments()
-    # @param[in] h The integration step size, see self.h and self.hReversed
+    # @param[in] h The number of integration steps, see self.h and self.hReversed
     # @paran[in] y0 The initial conditions for the integration.
     # @param[in] The lattice used for the integration
     # @param[in] verbose Print out verbose info while running the integration
@@ -393,7 +393,9 @@ class MomentSolver:
             t0 = elem[0]
             t1 = elem[1]
             k = elem[2]
-            tsteps = np.arange(t0,t1,h)
+            tsteps = np.linspace(t0,t1,h)
+            stepSize = tsteps[1] - tsteps[0]
+            tsteps = tsteps[0:-1]
             tout = np.concatenate((tout,tsteps))
             kval = np.concatenate((kval,[k]*len(tsteps)))
             
@@ -409,11 +411,11 @@ class MomentSolver:
             y = ytmp[:,0]        
             for i,t in enumerate(tsteps):
                 t1, Otmp[0,i], Ntmp[0,i] = F(t,y,elem[2], elem[3])
-                s1 = h*t1
+                s1 = stepSize*t1
                 t2,_,_ = F(t+h/2.0, y+s1/2.0, elem[2], elem[3])
-                s2 = h*t2
+                s2 = stepSize*t2
                 t3,_,_ = F(t+h, y-s1+2.0*s2, elem[2], elem[3])
-                s3 = h*t3
+                s3 = stepSize*t3
                 y = y + (s1 + 4.0*s2 + s3)/6.0
                 ytmp[:,i+1] = y
                 
@@ -422,7 +424,7 @@ class MomentSolver:
             Oval = np.concatenate((Oval,Otmp),axis=1)
             Nval = np.concatenate((Nval,Ntmp),axis=1)
         
-        tout = np.concatenate((tout,np.array([tout[-1]+h])))
+        tout = np.concatenate((tout,np.array([tout[-1]+stepSize])))
         kval = np.concatenate((kval,np.array([k])))
         
         # final eval for O matrices
@@ -725,7 +727,7 @@ class MomentSolver:
     ## Plot the beam size after running a moment solution
     #
     #
-    def PlotBeamSize(self, useAdjointVariables=False):
+    def PlotBeamSize(self, scale=1.0, useAdjointVariables=False):
         
         plt.figure()
         
@@ -736,7 +738,7 @@ class MomentSolver:
         else:
             plt.plot(self.z, self.y[0,:] + self.y[1,:], label='x^2')
             plt.plot(self.z, self.y[0,:] - self.y[1,:], label='y^2')        
-            plt.plot(self.z, self.k / 1e2*1e-6*0.2 / self.rigidity, color='k', label='quad strength')
+            plt.plot(self.z, self.k / 1e2*1e-6*0.2*scale / self.rigidity, color='k', label='quad strength')
         
         plt.grid(True)
         plt.legend()

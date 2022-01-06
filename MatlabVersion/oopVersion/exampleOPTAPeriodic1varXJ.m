@@ -1,27 +1,32 @@
 
 verbose = false;
-plotverbose = false;
 
-fixedEpm = false;
-useJvar = true;
+fixedEpm = false; % manually recalculate E each time
+useJvar = true; % use the J constrain gradients
+nonegative = false; % if Q+ or E+ are negative, take absolute value and continue
+dontOverStepFlag = true;  % readjust gamma to make sure steps are positive
 
+% generate some random numbers
+rng('default');
+rng(2);
 % Initial conditions
-X0 = [
-    0.001306266362858
-    -0.000681110843097
-    0
-    0.000082600114162
-    0.000160506016655
-    0
-    0.121505236229312
-    0.063375320588014
-    0
-    0
-    0 ] * 1e-3;
 
-% calculate E+ and E-
-ex2 = 7.0e-6^2;
-ey2 = 7.0e-6^2;
+X0 = [
+    rand % Q+
+    rand % Q-
+    0    % Qx
+    rand % P+
+    rand % P-
+    0    % Px
+    0    % E+
+    0    % E-
+    0    % Ex
+    0    % L
+    0 ] * 1e-3; % phi (leftover from Flat-Round stuff, represents rotation angle in larmor frame)
+
+% calculate E+ and E- for a give emittance
+ex2 = 7.6e-6^2; % target emittance X
+ey2 = 7.6e-6^2; % target emittance Y
 denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
 numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
 Ep = 0.5*((numer1 / denom1) + (numer2 / denom2));
@@ -32,11 +37,12 @@ X0(8) = Em;
 % create lattice
 Xn = X0';
 
-turns = 3;
-numEvenCells = 5;
+turns = 1;
+numEvenCells = 5; % not used atm
 
 % setup moment object
-mom = MomentSolverPeriodic(10e3, 0.0, X0);
+mom = MomentSolverPeriodic(10e3, 0.0, X0); % energy, beam current, initial conditions
+mom.h = 1000; % integration steps in each element
 % create lattice
 an = ones(5,1)';
 mom = CreateLattice(mom, an, turns, 0);
@@ -53,11 +59,11 @@ mom.PlotBeamSize();
 
 % gradient
 df0 = mom.CalcFoMGradientX();
-dj0 = mom.CalcFoMGradientJ();
+[dj0,j0] = mom.CalcFoMGradientJ();
 
 % gradient descent parameter
 gamma = (f0/sum(df0.^2));
-%%
+
 % init arrays
 gamma_h = gamma;
 Xn_h = Xn;
@@ -65,12 +71,21 @@ f_h = f0;
 fp_h = f0p;
 df_h = df0;
 dj_h = {dj0};
+j_h = j0;
 
-% adjust starting gamma
+%% adjust starting gamma
+% Here we keep reepeating the same initial step and recalculating until we get a good starting gamma
+% that lowers our figure of merit.
+
+% Take a step
 if useJvar
     Xn_h(end+1,:) = Xn - gamma_h(end)*df0' + gamma_h(end)*calcJcomponent(dj0, df0)'; % iterate
 else
     Xn_h(end+1,:) = Xn - gamma_h(end)*df0';
+end
+if nonegative
+    Xn_h(end,1) = abs(Xn_h(end,1));
+    Xn_h(end,7) = abs(Xn_h(end,7));
 end
 if fixedEpm
     denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
@@ -83,15 +98,23 @@ end
 mom.initialMoments = Xn_h(end,:)';
 mom = mom.RunMoments(verbose);
 
+% calculate FoM
 [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1(); % get FoM
-%%
 fprintf(['FoM: ',num2str(f_h(end)),'\n']);
+
+% repeat the step until we get a FoM lower than what we started with
 while f_h(end) >= f0
-    gamma_h(end+1) = gamma_h(end)/2.0;
+    gamma_h(end+1) = gamma_h(end)/2.0; % keep updating gamma here
+    
+    % Take a step
     if useJvar
         Xn_h(end+1,:) = Xn - gamma_h(end)*df0' + gamma_h(end)*calcJcomponent(dj0, df0)'; % iterate
     else
         Xn_h(end+1,:) = Xn - gamma_h(end)*df0';
+    end
+    if nonegative
+        Xn_h(end,1) = abs(Xn_h(end,1));
+        Xn_h(end,7) = abs(Xn_h(end,7));
     end
     if fixedEpm
         denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
@@ -104,43 +127,42 @@ while f_h(end) >= f0
     mom.initialMoments = Xn_h(end,:)';
     mom = mom.RunMoments(verbose);
     
+    % calculate FoM
     [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1(); % get FoM
     fprintf(['FoM: ',num2str(f_h(end)),'\n']);
 end
-%%
-if plotverbose
-    figure('units','pixels','position',[100,100,1000,750]);
-end
-lastNpts = 100;
-while 1
+%% Gradient descent algorithm
+
+while 1 % let it run forever and break with ctrl-c , or if conditions are met at the end of this while loop it will break automatically
     ii=1;
-    while f_h(end) < f_h(end-1)
-        if plotverbose
-            if (length(f_h) < lastNpts)
-                subplot(3,3,1:3); cla();
-                plot(log10(f_h));
-                for i = 4:(4+length(an)-1)
-                    subplot(3,3,i); cla();
-                    plot(an_h(:,i-3));
-                end
-            else
-                subplot(3,3,1:3); cla();
-                plot(log10(f_h(end-100+1:end)));
-                for i = 4:(4+length(an)-1)
-                    subplot(3,3,i); cla();
-                    plot(an_h(end-100+1:end,i-3));
-                end
-            end
-            pause(0.01);
-        end
-        
+    % while the FoM keeps decreasing
+    while f_h(end) < f_h(end-1)    
         fprintf(['Iterating ',num2str(ii),'\n']);
         
-        % iterate
-        if useJvar
-            Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)' + gamma_h(end)*calcJcomponent(dj_h{end}, df_h(:,end))';
-        else
-            Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+        % iterate, take a step
+        while 1
+            if useJvar
+                tmp = Xn_h(end,:) - gamma_h(end)*df_h(:,end)' + gamma_h(end)*calcJcomponent(dj_h{end}, df_h(:,end))';
+            else
+                tmp = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+            end
+            
+            if dontOverStepFlag
+                if ( tmp(1) < 0 || tmp(7) < 0 )
+                    gamma_h(end+1) = gamma_h(end)/2.0; % gradient step too much, stepped into negative
+                else
+                    Xn_h(end+1,:) = tmp;
+                    break;
+                end
+            else
+                Xn_h(end+1,:) = tmp;
+                break
+            end
+        end
+        
+        if nonegative
+            Xn_h(end,1) = abs(Xn_h(end,1));
+            Xn_h(end,7) = abs(Xn_h(end,7));
         end
         if fixedEpm
             denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
@@ -152,6 +174,11 @@ while 1
         end
         mom.initialMoments = Xn_h(end,:)';
         mom = mom.RunMoments(verbose);
+        if useJvar
+            [dj,js] = mom.CalcFoMGradientJ();
+            dj_h{end+1} = dj;
+            j_h(end+1,:) = js;
+        end
         
         % compute fom
         [f_h(end+1),fp_h(end+1,:)] = mom.GetFAndDF1();
@@ -163,11 +190,18 @@ while 1
         %end
     end
     
+    % if FoM is no longer decreasing, lets recalculate the adjoint
+    % equations
+    
     % recompute adjoint equation stuff for new direction
     fprintf(['Recomputing adjoint equations \n']);
     
     % grab last good settings
     Xn_h(end+1,:) = Xn_h(end-1,:);
+    if nonegative
+        Xn_h(end,1) = abs(Xn_h(end,1));
+        Xn_h(end,7) = abs(Xn_h(end,7));
+    end
     if fixedEpm
         denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
         numer1 = ex2 + 0.5*(Xn_h(end,4)+Xn_h(end,5)).^2; numer2 = ey2 + 0.5*(Xn_h(end,4)-Xn_h(end,5)).^2;
@@ -188,12 +222,13 @@ while 1
     df = mom.CalcFoMGradientX();
     df_h(:,end+1) = df;
     if useJvar
-        dj = mom.CalcFoMGradientJ();
+        [dj,js] = mom.CalcFoMGradientJ();
         dj_h{end+1} = dj;
+        j_h(end+1,:) = js;
     end
     
     if (ii == 2) % meaning no improving from recalculating gradient.
-        % change gamma
+        % recalculating gives no improvement, lets try adjusting gamma
         fprintf(['Updating Gamma \n']);
         f0n = f_h(end); Xnn = Xn_h(end,:);
         
@@ -203,6 +238,10 @@ while 1
                 Xn_h(end+1,:) = Xnn - gamma_h(end)*df_h(:,end)' + gamma_h(end)*calcJcomponent(dj_h{end}, df_h(:,end))'; % iterate
             else
                 Xn_h(end+1,:) = Xn_h(end,:) - gamma_h(end)*df_h(:,end)';
+            end
+            if nonegative
+                Xn_h(end,1) = abs(Xn_h(end,1));
+                Xn_h(end,7) = abs(Xn_h(end,7));
             end
             if fixedEpm
                 denom1 = (Xn_h(end,1)+Xn_h(end,2)); denom2 = (Xn_h(end,1)-Xn_h(end,2));
@@ -224,13 +263,12 @@ while 1
     % calculate learning rate
     %gamma_h(:,end+1) = gamma;
     
-    if f_h(end) < 1e-35
+    if f_h(end) < 1e-30 % break if we get this low
         break;
     end
-    if length(f_h) > 100000
+    if length(f_h) > 100000 % break if we have done this many iterations
         break;
-    end
-    
+    end    
 end
 
 
@@ -252,7 +290,7 @@ end
 M = inv(M);
 
 tmpipiece = zeros(11,1);
-for i = 1:N % for each Ji        
+for i = 1:N % for each Ji
     tmpjpiece = 0;
     for j = 1:N % for each Jj
         tmpjpiece = tmpjpiece + M(i,j) * ( dot(djs(:,j),dw) );

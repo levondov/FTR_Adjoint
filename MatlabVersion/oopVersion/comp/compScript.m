@@ -183,7 +183,7 @@ mom = MomentSolverPeriodic(Energy, 5.0e-3 / gamma^2, X0);
 mom.h = 1000;
 
 % create lattice
-periods = 20;
+periods = 60;
 mom = CreateLattice(mom, an, periods);
 mom = mom.RunMoments(true);
 aam = mom.y(:,1) + mom.y(:,2);

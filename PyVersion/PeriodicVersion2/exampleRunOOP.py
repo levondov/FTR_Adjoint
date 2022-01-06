@@ -62,7 +62,7 @@ if 1:
     quadrot = [0.0, 0.0, 0.0] # rotation angle [rad]
     
     # create lattice
-    mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.08, repeat=20, verbose=True)
+    mom.CreateLatticeProfile(dB, qstart, qend, quadrot, zstart=0.0, zend=0.08, repeat=10, verbose=True)
     # adjust beam properties
     mom.energy = 10e3
     mom.current = 0.0

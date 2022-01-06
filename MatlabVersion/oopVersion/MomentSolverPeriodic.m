@@ -197,10 +197,10 @@ classdef MomentSolverPeriodic
                 if ( h > 0 )
                     tsteps = linspace(t0,t1,h); %t0:h:(t1-h);
                 else
-                   tsteps = linspace(t1,t0,abs(h)); 
+                   tsteps = linspace(t0,t1,abs(h)); % t0,t1 get flipped at the beginning of function via flipping the obj.lattice
                 end
                 tsteps = tsteps(1:end-1);
-                stepSize = abs(tsteps(2) - tsteps(1));
+                stepSize = tsteps(2) - tsteps(1);
                 db = intlattice(j,3);
                 rot = intlattice(j,4);
                 
@@ -604,7 +604,7 @@ classdef MomentSolverPeriodic
             
         end
         
-        function [djs] = CalcFoMGradientJ(obj)
+        function [djs,js] = CalcFoMGradientJ(obj)
             idx = 1;
             % j terms term
             % ex2
@@ -658,6 +658,7 @@ classdef MomentSolverPeriodic
             djs(:,1) = dj1;
             djs(:,2) = dj2;
             %djs(:,3) = dj3;
+            js = [j1,j2];
             
         end        
         

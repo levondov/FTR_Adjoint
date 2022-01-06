@@ -15,18 +15,12 @@ X0 = [
                    0 ] * 1e-3;
 
 % calculate E+ and E-    
-if 1
-    ex2 = 7.6e-6^2;
-    ey2 = 7.6e-6^2;
-    denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
-    numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
-    Ep = (numer1 / denom1) + (numer2 / denom2);
-    Em = (numer1 / denom1) - (numer2 / denom2); 
-else
-    NN = length(mom.z)-1;
-    Ep = (mom.y(1,7)+mom.y(NN/2,7)) / 2.0;
-    Em = (mom.y(1,8)+mom.y(NN/2,8)) / 2.0;
-end
+ex2 = 7.6e-6^2;
+ey2 = 7.6e-6^2;
+denom1 = (X0(1)+X0(2)); denom2 = (X0(1)-X0(2));
+numer1 = ex2 + 0.5*(X0(4)+X0(5)).^2; numer2 = ey2 + 0.5*(X0(4)-X0(5)).^2;
+Ep = (numer1 / denom1) + (numer2 / denom2);
+Em = (numer1 / denom1) - (numer2 / denom2); 
 
 % create lattice
 Xn = X0';
@@ -38,6 +32,7 @@ mom = MomentSolverPeriodic(10e3, 0.0e-3, [X0(1:6);Ep;Em;X0(7:end)]);
 % create lattice
 an = ones(5,1)';
 mom = CreateLattice(mom, an, periods);
+mom.h = 1000;
 
 % run moment + adjoint equations
 mom = mom.RunMoments(verbose);

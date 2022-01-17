@@ -146,4 +146,9 @@ figure; plot(Xn_h(:,[1,7]),'linewidth',2); legend('Q+','E+'); xlabel('Iterations
 figure; plot(log10(fp_h),'linewidth',2); legend('|Q|^2','|P|^2','|E|^2','|L|^2'); xlabel('Iterations'); ylabel('log10(FoM)'); grid on;
 
 
+%%
+e0 = 7.6e-6^2;
+figure; plot(gammaVal,f_h(2:end)); xlabel('Gamma'); ylabel('FoM'); grid on;
+figure; plot([gammaVal',gammaVal'],j_h(2:end,:)./e0,'.-'); grid on;
+
 

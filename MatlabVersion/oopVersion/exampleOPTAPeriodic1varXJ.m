@@ -2,9 +2,9 @@
 verbose = false;
 
 fixedEpm = false; % manually recalculate E each time
-useJvar = true; % use the J constrain gradients
+useJvar = false; % use the J constrain gradients
 nonegative = false; % if Q+ or E+ are negative, take absolute value and continue
-dontOverStepFlag = true;  % readjust gamma to make sure steps are positive
+dontOverStepFlag = false;  % readjust gamma to make sure steps are positive
 
 % generate some random numbers
 rng('default');
@@ -280,14 +280,14 @@ function [dX] = calcJcomponent(djs, dw)
 [~,N] = size(djs);
 
 % calculate M matrix
-M = zeros(N,N);
+M1 = zeros(N,N);
 for i = 1:N
     for j = 1:N
-        M(i,j) = dot(djs(:,i),djs(:,j));
+        M1(i,j) = dot( djs(:,i),djs(:,j) );
     end
 end
 % inverse it
-M = inv(M);
+M = inv(M1);
 
 tmpipiece = zeros(11,1);
 for i = 1:N % for each Ji
@@ -301,14 +301,4 @@ end
 dX = tmpipiece;
 
 end
-
-
-
-
-
-
-
-
-
-
 

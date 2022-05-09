@@ -33,7 +33,7 @@ classdef MomentSolverPeriodicChaser
         kAdj
         
         % Moment equations
-        k0 = 40;
+        k0 = 157;
         Omat
         Nmat
         
@@ -668,6 +668,9 @@ classdef MomentSolverPeriodicChaser
             
             y = obj.y;
             k0 = obj.k0;
+            yn = y; % normalize
+            et = 6.2e-6;
+            yn = yn ./ et;
             
             % match location
             mloc = (length(obj.z));
@@ -679,10 +682,10 @@ classdef MomentSolverPeriodicChaser
             dLy = zeros(1,1); gLy = dLy;
             
             % figure of merit periodic
-            FoM1 = 0.5 * k0^2 * sum((y(mloc,1:3) - y(1,1:3)).^2);
-            FoM2 = 0.5 * sum((y(mloc,4:6) - y(1,4:6)).^2);
-            FoM3 = 0.5 * k0^(-2) * sum((y(mloc,7:9) - y(1,7:9)).^2);
-            FoM4 = 0.5 * sum((y(mloc,10) - y(1,10)).^2);
+            FoM1 = 0.5 * k0^2 * sum((yn(mloc,1:3) - yn(1,1:3)).^2);
+            FoM2 = 0.5 * sum((yn(mloc,4:6) - yn(1,4:6)).^2);
+            FoM3 = 0.5 * k0^(-2) * sum((yn(mloc,7:9) - yn(1,7:9)).^2);
+            FoM4 = 0.5 * sum((yn(mloc,10) - yn(1,10)).^2);
             
             % dF/dQ
             gQy(1:3) = k0^2 * (y(mloc,1:3) - y(1,1:3));

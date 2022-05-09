@@ -28,7 +28,7 @@ end
                
 momOpt = adjointChaserOpt(0, 2, X0, X0);
 momOpt.useJConstraint = true;
-momOpt.lambdaY = 1.0e-11;
+momOpt.lambdaY = 1.0e-12;
 momOpt.momY.M = 2;
 momOpt.momY.QTE = 3.933066132264529e-07;
 
@@ -56,11 +56,63 @@ end
 % Here we run our gradient descent algorithm
 Xntmp = [];
 while ~endOpt % let it run forever and break with ctrl-c , or if conditions are met at the end of this while loop it will break automatically
+    ii = 0; iiy = 0; iix = 0;
 
-    if ( runYopt)
+    if ( runYopt && runXopt )
+        % if this is false, we stop taking steps and recompute gradients
+        yStepCondition = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) < (momOpt.WY_h(end-1) + momOpt.lambdaY*momOpt.FeY_h(end-1));
+        xStepCondition = (momOpt.WX_h(end)) < (momOpt.WX_h(end-1));        
+        ii = 1;
+        while ( true == yStepCondition && true == xStepCondition )
+            fprintf(['Iterating ',num2str(iiy),'\n']);
+
+            % take steps
+            momOpt = momOpt.takeStepY();
+            momOpt = momOpt.takeStepX();
+            ii = ii + 1;
+
+            % iterative scheme to get J back to starting J0 value
+            momOpt = momOpt.iterateJForY();  
+            momOpt = momOpt.iterateJForX(); 
+
+            % Run moment equations and update FoM
+            momOpt = momOpt.UpdateFoMAll();
+
+            % if we take 50+ steps without having to recompute gradients, our
+            % steps are probably too small, let's start increasing gamma
+            if ( ii > 50 )
+                % increase gamma
+                fprintf(['Too many small steps, increasing gamma... \n']);
+                momOpt.gammaY_h(end+1) = momOpt.gammaY_h(end) * 2.0;
+                momOpt.gammaX_h(end+1) = momOpt.gammaX_h(end) * 2.0;
+                ii = 0;
+            end
+
+            % update best values
+            if (momOpt.WY_h(end) < momOpt.WbestY_h(end))
+               momOpt.WbestY_h(end+1) = momOpt.WY_h(end); 
+            end
+            if (momOpt.FeY_h(end) < momOpt.FebestY_h(end))
+               momOpt.FebestY_h(end+1) = momOpt.FeY_h(end); 
+            end  
+            if ( (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) <  momOpt.WandFebestY_h(end) )
+                momOpt.WandFebestY_h(end+1) = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end));
+            end            
+            if (momOpt.WX_h(end) < momOpt.WbestX_h(end))
+               momOpt.WbestX_h(end+1) = momOpt.WX_h(end); 
+            end
+
+            % if this is false, we stop taking steps and recompute gradients
+            yStepCondition = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) < (momOpt.WY_h(end-1) + momOpt.lambdaY*momOpt.FeY_h(end-1));
+            xStepCondition = (momOpt.WX_h(end)) < (momOpt.WX_h(end-1));          
+
+        end
+    elseif ( true == runYopt )
+         % if this is false, we stop taking steps and recompute gradients
+        yStepCondition = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) < (momOpt.WY_h(end-1) + momOpt.lambdaY*momOpt.FeY_h(end-1));                   
         iiy=1;
         % while the FoM keeps decreasing
-        while (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) < (momOpt.WY_h(end-1) + momOpt.lambdaY*momOpt.FeY_h(end-1))
+        while ( true == yStepCondition )
             fprintf(['Iterating ',num2str(iiy),'\n']);
     
             momOpt = momOpt.takeStepY();
@@ -91,13 +143,15 @@ while ~endOpt % let it run forever and break with ctrl-c , or if conditions are 
             if ( (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) <  momOpt.WandFebestY_h(end) )
                 momOpt.WandFebestY_h(end+1) = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end));
             end
-        end
-    end
 
-    if ( runXopt)
+            yStepCondition = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) < (momOpt.WY_h(end-1) + momOpt.lambdaY*momOpt.FeY_h(end-1));                   
+                    
+        end
+    elseif ( true == runXopt )
+        xStepCondition = (momOpt.WX_h(end)) < (momOpt.WX_h(end-1));
         iix=1;
         % while the FoM keeps decreasing
-        while (momOpt.WX_h(end)) < (momOpt.WX_h(end-1))
+        while ( true == xStepCondition )
             fprintf(['Iterating ',num2str(iix),'\n']);
     
             momOpt = momOpt.takeStepX();
@@ -122,8 +176,12 @@ while ~endOpt % let it run forever and break with ctrl-c , or if conditions are 
             if (momOpt.WX_h(end) < momOpt.WbestX_h(end))
                momOpt.WbestX_h(end+1) = momOpt.WX_h(end); 
             end
+
+            xStepCondition = (momOpt.WX_h(end)) < (momOpt.WX_h(end-1));               
         end
-    end    
+    else
+        % not running any optimization??
+    end 
 
     % if FoM is no longer decreasing, lets recalculate the adjoint
     % equations
@@ -136,10 +194,31 @@ while ~endOpt % let it run forever and break with ctrl-c , or if conditions are 
     
     % calc adjoint equations
     momOpt = momOpt.RecalculateGradients();
+
+    % this should be called if we are running both X and Y opt
+    if (ii == 2) % meaning no improving from recalculating gradient.
+    % recalculating gives no improvement, lets try adjusting gamma
+        %momOpt = momOpt.findStartingGammaY();
+        %momOpt = momOpt.findStartingGammaX();        
+        
+        if (momOpt.WY_h(end) < momOpt.WbestY_h(end))
+           momOpt.WbestY_h(end+1) = momOpt.WY_h(end); 
+        end  
+        if (momOpt.FeY_h(end) < momOpt.FebestY_h(end))
+           momOpt.FebestY_h(end+1) = momOpt.FeY_h(end); 
+        end   
+        if ( (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end)) <  momOpt.WandFebestY_h(end) )
+            momOpt.WandFebestY_h(end+1) = (momOpt.WY_h(end) + momOpt.lambdaY*momOpt.FeY_h(end));
+        end    
+        if (momOpt.WX_h(end) < momOpt.WbestX_h(end))
+           momOpt.WbestX_h(end+1) = momOpt.WX_h(end); 
+        end            
+    end
     
+    % this should only be called if we are running just Y opt
     if (iiy == 2) % meaning no improving from recalculating gradient.
         % recalculating gives no improvement, lets try adjusting gamma
-        momOpt = momOpt.findStartingGammaY();
+        %momOpt = momOpt.findStartingGammaY();
         
         if (momOpt.WY_h(end) < momOpt.WbestY_h(end))
            momOpt.WbestY_h(end+1) = momOpt.WY_h(end); 
@@ -152,28 +231,25 @@ while ~endOpt % let it run forever and break with ctrl-c , or if conditions are 
         end        
     end
 
+    % this should only be called ifw e are running just X opt
     if (iix == 2) % meaning no improving from recalculating gradient.
         % recalculating gives no improvement, lets try adjusting gamma
-        momOpt = momOpt.findStartingGammaX();
+        %momOpt = momOpt.findStartingGammaX();
         
         if (momOpt.WX_h(end) < momOpt.WbestX_h(end))
            momOpt.WbestX_h(end+1) = momOpt.WX_h(end); 
         end        
     end    
     
-    if momOpt.WY_h(end) < 1e-30 % break if we get this low
+    if momOpt.WX_h(end) < 1e-30 % break if we get this low
         endOpt = true;
     end
-    if length(momOpt.WY_h(end)) > 100000 % break if we have done this many iterations
+    if length(momOpt.WX_h(end)) > 100000 % break if we have done this many iterations
         endOpt = true;
     end
 end
 
-%%
-% figure; 
-% subplot(1,3,1); plot(log10(momOpt.WbestX_h)); title('W(X,a)');
-% subplot(1,3,2); plot(log10(momOpt.WbestY_h)); title('W(Y,a)');
-% subplot(1,3,3); plot(momOpt.FeY_h); title('FE(Y,a)');
+%% Some plots to post afterwards;
 
 momOpt.momY.PlotBeamSize
 momOpt.momX.PlotBeamSize
@@ -202,6 +278,23 @@ xlabel('Z [m]');
 ylabel('Moments');
 legend('Q+','QTE');
 title('Final Solution, Q+ vs z with QTE');
+
+figure;
+subplot(1,3,1); hold on;
+plot(momOpt.momY.z, abs(momOpt.momY.y(:,1) - momOpt.momX.y(:,1)) ./ momOpt.momX.y(:,1),'linewidth',2);
+xlabel('Z [m]')
+ylabel('Moments [m^2]');
+title('Q+ comparison');
+subplot(1,3,2); hold on;
+plot(momOpt.momY.z, abs(momOpt.momY.y(:,4) - momOpt.momX.y(:,4)) ./ momOpt.momX.y(:,4),'linewidth',2);
+xlabel('Z [m]')
+ylabel('Moments [m^2]');
+title('P+ comparison');
+subplot(1,3,3); hold on;
+plot(momOpt.momY.z, abs(momOpt.momY.y(:,7) - momOpt.momX.y(:,7)) ./ momOpt.momX.y(:,7),'linewidth',2);
+xlabel('Z [m]')
+ylabel('Moments [m^2]');
+title('E+ comparison');
 
 %%
 

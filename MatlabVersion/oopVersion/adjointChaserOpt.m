@@ -202,7 +202,7 @@ classdef adjointChaserOpt
 
         function obj = findStartingGammaX(obj)
             % repeat this step until we get a FoM lower than what we started with
-            fprintf(['FoM: ',num2str(obj.WX_h(end)),'\n']);
+            fprintf(['Finding GammaX FoM: ',num2str(obj.WX_h(end)),'\n']);
             ii = 0;
             f0 = obj.WX_h(end);
             X0 = obj.Xn_h(:,end);
@@ -218,7 +218,7 @@ classdef adjointChaserOpt
 
                 % calculate FoM
                 [obj.WX_h(end+1), obj.WpX_h(end+1,:)] = obj.momX.GetW();
-                fprintf(['FoM: ',num2str(obj.WX_h(end)),'\n']);
+                fprintf(['Finding GammaX FoM: ',num2str(obj.WX_h(end)),'\n']);
                 ii = ii +1;
                 if ( ii > 40 )
                     fprintf(['Can not take a first step to lower FoM W \n']);
@@ -230,7 +230,7 @@ classdef adjointChaserOpt
 
         function obj = findStartingGammaY(obj)
             % repeat this step until we get a FoM lower than what we started with
-            fprintf(['FoM: ',num2str(obj.WY_h(end) + obj.lambdaY * obj.FeY_h(end)),'\n']);
+            fprintf(['Finding GammaY FoM: ',num2str(obj.WY_h(end) + obj.lambdaY * obj.FeY_h(end)),'\n']);
             ii = 0;
             f0 = obj.WY_h(end) + obj.lambdaY * obj.FeY_h(end);
             Y0 = obj.Yn_h(:,end);
@@ -247,7 +247,7 @@ classdef adjointChaserOpt
                 % calculate FoM
                 [obj.WY_h(end+1), obj.WpY_h(end+1,:)] = obj.momY.GetW();
                 [obj.FeY_h(end+1)] = obj.momY.GetFE();
-                fprintf(['FoM: ',num2str(obj.WY_h(end)+obj.lambdaY *obj.FeY_h(end)),'\n']);
+                fprintf(['Finding GammaY FoM: ',num2str(obj.WY_h(end)+obj.lambdaY *obj.FeY_h(end)),'\n']);
                 ii = ii +1;
                 if ( ii > 40 )
                     fprintf(['Can not take a first step to lower FoM W \n']);
@@ -312,13 +312,17 @@ classdef adjointChaserOpt
 
         function obj = GrabLastGoodValues(obj)
             % grab last good settings
-            obj.Xn_h(:,end+1) = obj.Xn_h(:,end-1);
-            obj.Yn_h(:,end+1) = obj.Yn_h(:,end-1);   
-            obj.WX_h(end+1) = obj.WX_h(end-1);
-            obj.WY_h(end+1) = obj.WY_h(end-1); 
-            obj.WpX_h(end+1,:) = obj.WpX_h(end-1,:);
-            obj.WpY_h(end+1,:) = obj.WpY_h(end-1,:);    
-            obj.FeY_h(end+1) = obj.FeY_h(end-1);
+            try
+                obj.Xn_h(:,end+1) = obj.Xn_h(:,end-1);
+                obj.WX_h(end+1) = obj.WX_h(end-1); 
+                obj.WpX_h(end+1,:) = obj.WpX_h(end-1,:);            
+            end
+            try
+                obj.Yn_h(:,end+1) = obj.Yn_h(:,end-1);   
+                obj.WY_h(end+1) = obj.WY_h(end-1); 
+                obj.WpY_h(end+1,:) = obj.WpY_h(end-1,:);    
+                obj.FeY_h(end+1) = obj.FeY_h(end-1);
+            end
         end
         
         % Related to J calculation

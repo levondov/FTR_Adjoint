@@ -8,7 +8,7 @@ end
 qlength = 0.02;
 
 qstart = [0.0, 0.03, 0.07];
-db = [0.15*a(1), -0.15*a(3), 0.15];
+db = [0.5*a(1), -0.5*a(3), 0.5];
 qend = [qstart(1)+qlength/2.0, qstart(2)+qlength, qstart(3)+qlength/2.0];
 qrot = [0.0, 0.0, 0.0, 0.0];
 

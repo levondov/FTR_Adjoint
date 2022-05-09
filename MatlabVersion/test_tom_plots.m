@@ -80,3 +80,32 @@ plot(-x1,fom_int1+oset); plot(x1,fom_val1); title('Solenoid strength');
 legend('Integral','direct measurement','location','southeast');
 xlabel('\Delta k_\Omega^2'); ylabel('\Delta FoM');
 grid on;
+
+%%
+global k_perv k0 hardedge_flag e1 e2
+k_perv = c2perv(0.0);
+k0 = 10;
+e1 = 0.0;
+e2 = 0.0;
+hardedge_flag = 1;
+
+a = [
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1]';
+
+[z,ybase] = gd_y(a);
+
+
+
+
+
+

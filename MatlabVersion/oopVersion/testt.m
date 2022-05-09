@@ -151,4 +151,64 @@ e0 = 7.6e-6^2;
 figure; plot(gammaVal,f_h(2:end)); xlabel('Gamma'); ylabel('FoM'); grid on;
 figure; plot([gammaVal',gammaVal'],j_h(2:end,:)./e0,'.-'); grid on;
 
+%%
+Qp = 0.000407212723699*1e-3;
+M = 2;
+L = 0.08;
+QTE = linspace(Qp*0.50,Qp*1.50,100);
+
+f = (1/L) * (Qp./QTE - 1).^M;
+
+figure;
+plot(QTE,log10(f));
+xlabel('QTE');
+ylabel('log10(f)')
+title('log_{10}(f) vs Q_{TE}');
+
+[val,idx] = min(f);
+QTE(idx)
+
+
+%% Test dF/da
+%momOpt.momY = momOpt.momY.UpdateLatticeProfile(ones(6,1));
+%momOpt.momY.RunMoments();
+%momOpt.momY.RunMomentsAdjoint();
+
+%dwyda = momOpt.momY.GetWGradientA();
+%dwxda = momOpt.momY.GetWGradientA();
+%rightside = (1/1e-12) * (dwyda - dwxda);
+
+if 1
+    aa = ones(6,1);
+    da = ones(length(aa),1);            
+    abaseCase = aa;
+    apertAmount = 0.01;
+    lefside = zeros(length(aa), 1);
+    
+    for ii = 1:length(aa)
+       apert = abaseCase;
+       momOpt.momY = momOpt.momY.UpdateLatticeProfile(apert);
+       momOpt.momY = momOpt.momY.RunMoments();
+       nopertF = momOpt.momY.GetFE();
+    
+       apert(ii) = abaseCase(ii) + abaseCase(ii) * apertAmount;
+       momOpt.momY = momOpt.momY.UpdateLatticeProfile(apert);
+       momOpt.momY = momOpt.momY.RunMoments();
+       pertF = momOpt.momY.GetFE();   
+    
+       leftside(ii) = (pertF - nopertF) / apertAmount;
+    
+    end
+end
+
+%%
+figure; 
+
+subplot(1,2,1); hold on;
+plot(dwyda,'o-'); plot(dwxda,'o-');
+legend('dW(Y,a)/da','dW(X,a)/da');
+subplot(1,2,2); hold on;
+plot(leftside,'o-');
+plot(rightside/1e7,'o-');
+legend('LeftSide','RightSide / 1e6');
 

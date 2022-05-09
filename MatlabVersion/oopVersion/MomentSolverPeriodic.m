@@ -255,7 +255,9 @@ classdef MomentSolverPeriodic
             tout = tout';
             yout = yout';
             kval = kval' / obj.rigidity;
-            fprintf('\n')
+            if verbose
+                fprintf('\n')
+            end
             
         end
         

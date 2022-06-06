@@ -80,7 +80,7 @@ figure;
 subplot(1,3,1);
 oset = 0;
  hold on;
-plot(-x1,fom_int1+oset,'.-'); plot(x1,fom_val1,'.-'); title('Quad strength dFE/da'); 
+plot(-x1,fom_int1+oset,'.-'); plot(x1,fom_val1,'.-'); title('Quad strength dFE/dX'); 
 legend('Integral','direct measurement','location','southeast');
 grid on;
 
@@ -158,6 +158,65 @@ legend('Integral alone');
 
 subplot(1,3,3); hold on;
 plot(0,0);
+plot(x1,fom_val1,'.-')
+grid on;
+legend('','direct alone');
+
+%% Perturb X variables
+% setup lattice
+momXbase = MomentSolverPeriodicChaser(10e3, 0, X0); momXbase.h = 100; % default is h=10000 which is too much for now
+momXbase = momXbase.CreateLatticeProfile(db,qstart,qend,qrot, zstart, zend, period, false);
+
+% run moment + adjoint equations
+momXbase = momXbase.RunMoments();
+momXbase = momXbase.RunMomentsAdjoint();
+df0 = momXbase.GetWGradientX();
+
+FoM_base = momXbase.GetW;
+X0_nope = X0;
+
+NN = 40;
+pert_db = linspace(0.95,1.05,NN);
+
+% perturb db 1
+fom_val1 = zeros(NN,1);
+fom_int1 = zeros(NN,1);
+x1 = zeros(NN,1);
+Xp = X0;
+idx = 1;
+momX = momXbase;
+baseVal = [momXbase.y(1,idx), momXbase.y(end,idx)];
+pert_db(21)=1.0;
+for i = 1:NN
+    fprintf([num2str(i),'/',num2str(NN),'\n']);
+    % perturb X
+    Xp(idx) = X0(idx) * pert_db(i);
+    x1(i) = pert_db(i);  
+    
+    % direct FOM calculation
+    momX.initialMoments = Xp;
+    momX = momX.RunMoments();
+    fom_val1(i) = (FoM_base - momX.GetW);
+end
+fom_int1 = momX.k0 * X0(idx) * momXbase.GetWGradientX * (1 - pert_db);
+
+% plot
+
+figure; 
+subplot(1,3,1);
+oset = 0;
+ hold on;
+plot(x1,fom_int1(idx,:)+oset,'.-'); plot(x1,fom_val1,'.-'); title('Quad strength dQ+/dX'); 
+legend('adjoint','direct measurement','location','southeast');
+grid on;
+
+subplot(1,3,2);
+plot(x1,fom_int1(idx,:),'.-')
+grid on;
+legend('adjoint alone');
+
+subplot(1,3,3); hold on;
+plot(1,0);
 plot(x1,fom_val1,'.-')
 grid on;
 legend('','direct alone');

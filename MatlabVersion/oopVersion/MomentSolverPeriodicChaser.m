@@ -33,7 +33,7 @@ classdef MomentSolverPeriodicChaser
         kAdj
         
         % Moment equations
-        k0 = 157;
+        k0 = 78;
         Omat
         Nmat
         
@@ -196,7 +196,7 @@ classdef MomentSolverPeriodicChaser
             obj.yOri = flip(y(:,12:end),1);
             obj.yAdj = flip(y(:,1:11),1);
             obj.kAdj = flip(kval);
-        end        
+        end
         
         % Custom ode3 solver
         function [tout,yout,kval,Omat,Nmat] = ode3(obj, F, h, y0, verbose)
@@ -670,7 +670,7 @@ classdef MomentSolverPeriodicChaser
             k0 = obj.k0;
             yn = y; % normalize
             et = 6.2e-6;
-            yn = yn ./ et;
+            %yn = yn ./ et;
             
             % match location
             mloc = (length(obj.z));
@@ -688,13 +688,13 @@ classdef MomentSolverPeriodicChaser
             FoM4 = 0.5 * sum((yn(mloc,10) - yn(1,10)).^2);
             
             % dF/dQ
-            gQy(1:3) = k0^2 * (y(mloc,1:3) - y(1,1:3));
+            gQy(1:3) = k0^2 * (yn(mloc,1:3) - yn(1,1:3));
             % dF/dP
-            gPy(1:3) = (y(mloc,4:6) - y(1,4:6));
+            gPy(1:3) = (yn(mloc,4:6) - yn(1,4:6));
             % dF/dE
-            gEy(1:3) = k0^(-2) * (y(mloc,7:9) - y(1,7:9));
+            gEy(1:3) = k0^(-2) * (yn(mloc,7:9) - yn(1,7:9));
             % dF/dL
-            gLy(1)   = (y(mloc,10) - y(1,10));
+            gLy(1)   = (yn(mloc,10) - yn(1,10));
             
             % adjoint variables
             dQy = - gEy;

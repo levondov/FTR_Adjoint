@@ -25,17 +25,18 @@ X0 = [
 for i = 1:length(X0)
     X0(i) = X0(i) + X0(i)*rand*0.05;
 end
-               
+
 momOpt = adjointChaserOpt(0, 2, X0, X0);
 momOpt.useJConstraint = true;
+et = 6.2e-6;
 momOpt.lambdaY = 1.0e-12;
 momOpt.momY.M = 2;
-momOpt.momY.QTE = 3.933066132264529e-07;
+momOpt.momY.QTE = 3.933066132264529e-7;
 
 momOpt = momOpt.initX();
 momOpt = momOpt.initY();
 
-momOpt.momY.PlotBeamSize
+momOpt.momY.PlotBeamSize;
 
 figure;
 plot(momOpt.momY.z, momOpt.momY.y(:,1),'linewidth',2); hold on;
@@ -295,6 +296,16 @@ plot(momOpt.momY.z, abs(momOpt.momY.y(:,7) - momOpt.momX.y(:,7)) ./ momOpt.momX.
 xlabel('Z [m]')
 ylabel('Moments [m^2]');
 title('E+ comparison');
+
+dd = sum(( momOpt.Yn_h(:,:) - momOpt.Xn_h(:,:) ).^2,1);
+
+figure;
+plot(log10(dd),'linewidth',2);
+xlabel('Z [m]')
+ylabel('Moments [m^2]');
+title('Q+ comparison');
+
+
 
 %%
 

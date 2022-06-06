@@ -95,7 +95,7 @@ classdef adjointChaserOpt
             obj.djX_h = {dj0};
 
             % gradient descent parameter
-            gammaX = (w0/sum(df0.^2));
+            gammaX = 1;%(w0/sum(df0.^2));
 
             % init arrays
             obj.WX_h = w0;
@@ -123,7 +123,7 @@ classdef adjointChaserOpt
             obj.djY_h = {dj0};
 
             % gradient descent parameter
-            gammaY = (w0/sum(df0.^2));
+            gammaY = 1; %(w0/sum(df0.^2));
 
             % init arrays
             obj.WY_h = w0;
@@ -234,7 +234,7 @@ classdef adjointChaserOpt
             ii = 0;
             f0 = obj.WY_h(end) + obj.lambdaY * obj.FeY_h(end);
             Y0 = obj.Yn_h(:,end);
-            while (obj.WY_h(end) + obj.lambdaY * obj.FeY_h(end)) >= f0
+            while (obj.WY_h(end) + obj.lambdaY(end) * obj.FeY_h(end)) >= f0
                 obj.gammaY_h(end+1) = obj.gammaY_h(end)/2.0; % use same thing for Y
 
                 % Take a step
